@@ -1,5 +1,5 @@
 /**
- * pstack role keys used by playbooks and `/setup-pstack`.
+ * pstack role keys used by playbooks and Settings → pstack.
  * These are pstack names, not Cursor slugs and not grok-build `subagent_type` values.
  */
 
