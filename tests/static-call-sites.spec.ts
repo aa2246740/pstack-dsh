@@ -16,7 +16,7 @@ const FORBIDDEN: { id: string; re: RegExp; allow?: string[] }[] = [
   { id: 'pstack-models.mdc', re: /pstack-models\.mdc/ },
   { id: 'claude-fable-5-thinking-max', re: /claude-fable-5-thinking-max/ },
   { id: 'gpt-5.6-sol-max', re: /gpt-5\.6-sol-max/ },
-  { id: 'grok-4.6-fast-xhigh', re: /grok-4.6-fast-xhigh/ },
+  { id: 'grok-4.6-fast-xhigh', re: /grok-4\.6-fast-xhigh/ },
   { id: 'claude-opus-5-thinking-xhigh', re: /claude-opus-5-thinking-xhigh/ },
   { id: 'subagent_type assignment', re: /subagent_type:/, allow: ['skills/setup-pstack/references/spawn.md'] },
   { id: 'get_task_output', re: /get_task_output/ },
