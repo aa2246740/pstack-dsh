@@ -17,7 +17,7 @@ Allowed fields: `description`, `prompt`, `role`, `run_in_background`, `route_ind
 
 Forbidden on this call: `model`, `provider`, `reasoning_effort`, `thinking`, `isolation`, `subagent_type`, `environment`, `readonly`, `resume_from`.
 
-Route and effort come from `$DSH_HOME/pstack-dsh.json` when `/setup-pstack` mapped that role to a live logged-in route. Missing overlay, `inherit: true`, or empty `routes`: inherit this conversation. Usable without setup.
+Route and effort come from `$DSH_HOME/pstack-dsh.json` when Settings → pstack mapped that role to a live logged-in route. Missing overlay, `inherit: true`, or empty `routes`: inherit this conversation. Usable without setup.
 
 ## Fallback
 

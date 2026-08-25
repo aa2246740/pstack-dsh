@@ -37,10 +37,10 @@ Tool mapping is in [HARNESS.md](./HARNESS.md). [dshx](https://github.com/aa22467
 Two steps.
 
 1. 要做事、要严谨，直接用 [`/poteto-mode`](./skills/poteto-mode/SKILL.md)。不用先跑 setup。子 agent 默认继承当前对话的路由。
-2. 只有想给某个角色换已登录的路由时，才跑 [`/setup-pstack`](./skills/setup-pstack/SKILL.md)。它是可选的、全局的，写入 `$DSH_HOME/pstack-dsh.json`。
+2. 只有想给某个角色换已登录的路由时，打开 **设置 → pstack**（导航「pstack 角色」/「pstack roles」）。页面写入 `$DSH_HOME/pstack-dsh.json`。[`/setup-pstack`](./skills/setup-pstack/SKILL.md) 只是指向那一页的指针。
 
 1. Use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) for work that needs rigor. No setup required. Children inherit this conversation's route.
-2. Optionally run [`/setup-pstack`](./skills/setup-pstack/SKILL.md) to pin a logged-in route per role. It is optional and global. It writes `$DSH_HOME/pstack-dsh.json`.
+2. To pin a logged-in route per role, open **Settings → pstack** (nav label **pstack 角色** / **pstack roles**). The page writes `$DSH_HOME/pstack-dsh.json`. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) is an optional pointer to that page.
 
 第一次用可以看 [pstack 指南](./docs/guide/README.md)。
 
@@ -52,9 +52,9 @@ The other skills are situational. The mode skill uses them when a step needs the
 
 ## 默认模型与 effort / Defaults
 
-装完就能用，不必先 `/setup-pstack`。
+装完就能用，不必先打开设置，也不必跑 `/setup-pstack`。
 
-A fresh install is usable without `/setup-pstack`.
+A fresh install is usable without Settings → pstack and without `/setup-pstack`.
 
 **模型 / Model.** 不要发送 `model`，除非 live catalog 里已经有这一条。没有 overlay 就继承父对话。不要编造 Cursor 面板 slug（`grok-4.6-fast-xhigh`、`gpt-5.6-sol-max`、`claude-fable-5-thinking-max`、`claude-opus-5-thinking-xhigh`）。
 
@@ -64,15 +64,17 @@ Do not send `model` unless that pair was detected live. Missing overlay inherits
 
 Effort is only the ids that route actually accepts. If the route has none, omit it. Skills never send `reasoning_effort` or `thinking` on spawn. Official `subagent` has no such field. Role effort lives in the overlay and is applied on `agent/request`.
 
-`/setup-pstack` 只列出已经登录的 API key 路由，以及 dsh-oauth-login 仓库里已经签过名、并且 `pi-*` 适配器已注册的路由。空目录就是继承父对话。
+**设置 / Settings.** 配置页是官方 Settings 里的 `settings.section`（id `pstack`，order 16）。只列出已登录路由；effort 只列出该路由 live `resolveModelInfo().reasoning.efforts`。空列表就是继承父对话。保存写同一份 overlay，不是第二份配置。
 
-`/setup-pstack` lists only logged-in API-key routes and signed-in dsh-oauth-login routes whose `pi-*` adapter is registered. An empty catalog means inherit the parent.
+The editor is the official Settings `settings.section` (id `pstack`, order 16). It lists logged-in routes only. Effort options are that route's live `resolveModelInfo().reasoning.efforts`. An empty list means inherit the parent. Save writes the same overlay, not a second file.
+
+设置页只列出已经登录的 API key 路由，以及 dsh-oauth-login 仓库里已经签过名、并且 `pi-*` 适配器已注册的路由。空目录就是继承父对话。
 
 ## 推荐依赖 / Recommended peer
 
-订阅登录（ChatGPT / Claude / Grok / Copilot / OpenRouter / Kimi）要出现在 setup 列表里，需要另装 [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login)。不是硬依赖。只用 API key 的用户可以不装。本插件不读写 `~/.pi`、`~/.codex`、`~/.claude`、grok CLI 登录文件。
+订阅登录（ChatGPT / Claude / Grok / Copilot / OpenRouter / Kimi）要出现在 **设置 → pstack** 列表里，需要另装 [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login)。不是硬依赖。只用 API key 的用户可以不装。本插件不读写 `~/.pi`、`~/.codex`、`~/.claude`、grok CLI 登录文件。
 
-Subscription logins show up as routes after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login). It is not required. API-key-only users work without it. This plugin does not read or write official CLI auth files.
+Subscription logins show up on **Settings → pstack** after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login). It is not required. API-key-only users work without it. This plugin does not read or write official CLI auth files.
 
 ```bash
 dsh plugin add github:aa2246740/dsh-oauth-login
@@ -80,9 +82,9 @@ dsh plugin add github:aa2246740/dsh-oauth-login
 
 ## 这不是 Cursor 插件 / Not the Cursor plugin
 
-这里的 [`/setup-pstack`](./skills/setup-pstack/SKILL.md) 只给 DeepSeek Harness 配路由。官方 Cursor `/setup-pstack` 会写 `~/.cursor/rules`，并用 Cursor 的模型名。不要在 DSH 上跑那份。
+这里的角色映射在 **设置 → pstack**。官方 Cursor `/setup-pstack` 会写 `~/.cursor/rules`，并用 Cursor 的模型名。不要在 DSH 上跑那份。
 
-[`/setup-pstack`](./skills/setup-pstack/SKILL.md) in this repo configures DSH routes. Official Cursor `/setup-pstack` writes `~/.cursor/rules` and uses Cursor slugs. Do not run it here.
+Role mapping in this repo is **Settings → pstack**. Official Cursor `/setup-pstack` writes `~/.cursor/rules` and uses Cursor slugs. Do not run it here.
 
 ## 工具 / Tools
 
@@ -95,10 +97,11 @@ This plugin registers:
 | `pstack_spawn` | 按角色起 DSH 子 agent。不要传 model / effort。 |
 | `pstack_catalog` | 只列出已登录的 live 路由。 |
 | `pstack_overlay_read` / `pstack_overlay_write` | 读写 `$DSH_HOME/pstack-dsh.json`。 |
+| Settings → pstack | 官方设置页。保存同一份 overlay。 |
 
-技能入口：`/poteto-mode`、`/setup-pstack`，以及 bundled 的 playbook / principle skills。
+技能入口：`/poteto-mode`，以及 bundled 的 playbook / principle skills。[`/setup-pstack`](./skills/setup-pstack/SKILL.md) 指向设置页。
 
-Slash entry: `/poteto-mode`, `/setup-pstack`, plus the bundled playbook and principle skills.
+Slash entry: `/poteto-mode`, plus the bundled playbook and principle skills. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) points at the Settings page.
 
 ## 开发 / Develop
 

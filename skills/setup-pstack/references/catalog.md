@@ -1,6 +1,6 @@
 # Live catalog
 
-`pstack_catalog` lists routes this DSH can actually call. It is not a vendor catalog.
+`pstack_catalog` lists routes this DSH can actually call. It is not a vendor catalog. The Settings → pstack page calls the same `buildCatalog` through `GET /plugins/pstack-dsh/settings`.
 
 ## Selectable
 

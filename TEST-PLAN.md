@@ -28,7 +28,7 @@ dshx setup --harness /path/to/deepseek-harness
 dshx check pstack-dsh --harness /path/to/deepseek-harness
 ```
 
-Must pass: named `export function apply`, no `export default`, boot marker `[my-plugins/pstack-dsh] loaded` in source, portable `cordis.yml`.
+Must pass: named `export function apply`, no `export default`, boot marker `[my-plugins/pstack-dsh] loaded` in source, portable `cordis.yml`, `dsh.client` + lazy-CJS `lib/client.js` (`window.__ModuleLoader__.load`).
 
 ## verify-boot (isolated cold boot)
 
@@ -52,13 +52,14 @@ This cloud checkout ran `dshx check` green. `dshx verify-boot pstack-dsh --port 
 - overlay write rejects `reasoningEffort` when that route has no efforts
 - overlay write rejects an effort id the live adapter did not list
 - missing overlay file → every role inherits
+- Settings snapshot/save uses the same overlay path and rejects unsigned slugs (`tests/settings-api.spec.ts`, `tests/settings-draft.spec.ts`)
 
-## Manual spawn (optional)
+## Manual Settings (EDITH / local DSH Web)
 
-In a real DSH session after `dsh plugin add ./pstack-dsh`:
+After `dsh plugin add ./pstack-dsh` and a **page reload**:
 
-1. `/poteto-mode` without setup. Child inherits the parent route.
-2. `/setup-pstack` with no keys and no oauth store. Picker is inherit-only.
-3. Add `DEEPSEEK_API_KEY` (or another logged-in adapter). Setup lists only that route. Effort options match `resolveModelInfo` or are omitted.
-4. `pstack_spawn` with `role: feature`. Confirm the tool schema has no `model` / `reasoning_effort`.
-5. Cancel with `interrupt_agent` (continuable) or `job_kill` (job).
+1. Open Settings (sidebar gear) → **pstack** / **pstack 角色**.
+2. With no keys and no oauth store: inherit-only, oauth recommend line, Save still writes inherit overlay.
+3. Add `DEEPSEEK_API_KEY` (or another logged-in adapter). Reload the page. The page lists only that route. Effort options match `resolveModelInfo` or are omitted.
+4. Save. `$DSH_HOME/pstack-dsh.json` matches the form. `pstack_spawn` does not grow `model` / `reasoning_effort` fields.
+5. `/setup-pstack` only points at Settings → pstack. It does not run a TUI picker.

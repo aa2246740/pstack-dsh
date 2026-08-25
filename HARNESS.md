@@ -12,7 +12,7 @@ Workbench: [dshx](https://github.com/aa2246740/dsh-external-plugin-devkit) (`dsh
 
 **Yes. The discipline ports. Cursor and Grok runtimes do not.**
 
-Install this repo as a DSH plugin. Do not write `~/.cursor/rules`. Do not invent Cursor panel slugs. Do not send grok `task` fields. Out of the box, children inherit this conversation's route. `/setup-pstack` is optional.
+Install this repo as a DSH plugin. Do not write `~/.cursor/rules`. Do not invent Cursor panel slugs. Do not send grok `task` fields. Out of the box, children inherit this conversation's route. Configure roles in **Settings → pstack**. `/setup-pstack` is an optional pointer.
 
 Official model-facing `subagent` cannot take a pstack role or a per-call model. This plugin registers `pstack_spawn`, which calls `ctx.subagents.start` / `startContinuable` on the shipped `spawn` provider and applies overlay route plus effort on the `agent/request` waterfall.
 
@@ -22,6 +22,7 @@ Official model-facing `subagent` cannot take a pstack role or a per-call model. 
 |---|---|---|
 | Slash skill / poteto-mode | `ctx.skills` provider + `dsh-tool-skill` `skill` tool. User `/name` injection. Frontmatter: kebab-case `name`, `description`, optional `whenToUse`, `disable-model-invocation`, `user-invocable`. `name: Poteto Mode` is invalid; this port uses `poteto-mode`. | `packages/skill/tool-skill/README.md`; `docs/subsystems/skills.md`; `packages/skill/skill-filesystem/README.md`; `packages/skill/skill/src/index.ts` `SKILL_NAME` `/^[a-z0-9]+(?:-[a-z0-9]+)*$/` |
 | Plugin install | npm bundle `dsh.bundle.patch` → `dsh plugin add` | `docs/user/develop/basic/publish.md` |
+| Settings GUI | Official **`settings.section`** list slot. This plugin registers id `pstack`, order 16, nav from `ctx.locale` (zh/en). Browser `dsh.client` + Host `GET`/`PUT` `/plugins/pstack-dsh/settings` on `ctx.webServer`. Overlay file unchanged. **Hypothesis:** slash skills cannot call `openSection`; that method is onboarding-only on `SettingsRoot`. | `packages/client/ui-settings/src/client/contract/slots.ts` `settings.section`; `packages/client/ui-settings-models/src/client/index.ts`; `packages/client/ui-settings-plugins/src/client/index.ts`; `packages/client/ui-settings-general/src/client/SettingsRoot.tsx` `openSection`; `packages/host/webserver/src/index.ts` `webServer.register`; dsh-oauth-login `src/client/index.tsx` |
 | Spawn child | Model-facing official tool **`subagent`**: only `description`, `prompt`, `run_in_background`. No model, effort, isolation, `subagent_type`. This plugin's **`pstack_spawn`**: those three plus `role` and optional `route_index`. Internally `ctx.subagents.start('spawn', …)` / `startContinuable`. | `docs/tool-catalog.md` `#deepseek-aidsh-tool-subagent`; `packages/subagent/tool-subagent/src/index.ts`; `packages/bundle/base/cordis.patch.yml` `providerName: spawn`, `toolName: subagent`, `backgroundMode: continuable` |
 | Per-child model | `AgentOptions` `{ provider?, model?, maxTokens? }` on `SubagentStartRequest.agentOptions`. Not a model-facing `subagent` field. "Another model requires another named tool instance" unless a plugin sets `agentOptions` at start. Overlay maps a logged-in route onto that object. Omit it to inherit the parent. | `packages/core/agent/src/runtime-types.ts` `AgentOptions`; `packages/subagent/subagent/src/types.ts` `SubagentStartRequest.agentOptions`; `packages/subagent/tool-subagent/README.md` Config `agentOptions` |
 | Per-role reasoning effort | **Not on `subagent`.** `LlmCallConfig.reasoningEffort` via the `agent/request` waterfall. Adapter-owned via `resolveModelInfo().reasoning.efforts`. Empty efforts: omit. Never copy grok `xhigh/high/medium/low` or Cursor `max` unless that exact id is on **this** route. | `packages/llm/llm/src/call-config.ts` `LlmCallConfig`; `packages/llm/llm/src/types.ts` `LlmModelReasoningInfo`; `packages/core/agent/src/runtime-types.ts` `'agent/request'`; `packages/llm/llm/src/index.ts` `resolveModelInfo` rejects invalid effort metadata |
@@ -82,7 +83,9 @@ Code-writing delegates: the playbook role key (`feature`, `bug-fix`, …). Ad-ho
 
 If a future DSH build stops firing host-level `agent/request` for in-process children, inherit-parent still works; mapped effort would not. Do not invent a spawn-tool field to paper over that.
 
-## What `/setup-pstack` may list
+## What Settings → pstack / `/setup-pstack` may list
+
+The Settings page is the editor. It reads and writes `$DSH_HOME/pstack-dsh.json` through the same `buildCatalog` / overlay modules spawn uses. `/setup-pstack` only tells the user to open that page.
 
 Only:
 
