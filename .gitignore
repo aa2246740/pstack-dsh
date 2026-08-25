@@ -1,0 +1,6 @@
+node_modules/
+.dshx/
+.env
+*.tgz
+coverage/
+.DS_Store
