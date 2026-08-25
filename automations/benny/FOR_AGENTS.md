@@ -59,7 +59,7 @@ the human enters setup by pointing cursor at this file. do not look for or invok
 1. ask which repository will run the automations.
 2. treat the directory containing this `FOR_AGENTS.md` as the source pack.
 3. merge the entire source pack into `<target-repository>/.cursor/automations/benny/`.
-4. preserve every destination-only files. never delete unrelated files or overwrite user-owned configuration, feature maps, or routing maps.
+4. preserve every destination-only file. never delete unrelated files or overwrite user-owned configuration, feature maps, or routing maps.
 5. when an existing destination file at a source-managed path differs, review the diff and merge without discarding local edits. if ownership is ambiguous, stop and ask before replacing it.
 6. verify that the copied `FOR_AGENTS.md` and `skills/setup-benny/SKILL.md` exist in the target repository.
 7. read and follow `.cursor/automations/benny/skills/setup-benny/SKILL.md` directly from the target repository.
