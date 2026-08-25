@@ -16,6 +16,7 @@ import {
   spawnTool,
   type ToolHost,
 } from './tools.ts'
+import { registerPstackSettingsRoutes } from './settings-routes.ts'
 
 export const name = PLUGIN_ID
 export const inject = ['tools', 'skills']
@@ -53,6 +54,9 @@ export function apply(ctx: Context, config?: PluginConfig): void {
   registerOne(ctx, overlayWriteTool(host))
   registerOne(ctx, spawnTool(host))
   ctx.skills.registerProvider(() => createSkillProvider())
+  ctx.inject(['webServer'], webCtx => {
+    registerPstackSettingsRoutes(webCtx, host)
+  })
 
   const events = ctx as Context & {
     on(event: string, listener: (...args: never[]) => unknown): unknown

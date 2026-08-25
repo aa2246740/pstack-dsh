@@ -1,7 +1,7 @@
 {
   "name": "pstack-dsh",
   "description": "DeepSeek Harness port of official pstack. Playbooks and principles are poteto's; only the harness call layer is rewritten.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
@@ -25,13 +25,14 @@
       "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
     },
+    "./client": "./lib/client.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown && node scripts/wrap-client.mjs",
     "prepare": "npm run build",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.client.json --noEmit",
     "test": "node --experimental-strip-types --test tests/*.spec.ts",
     "check": "npm run typecheck && npm run test && npm run build"
   },
@@ -52,6 +53,14 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-locale"
+      ],
+      "platform": "web"
     }
   },
   "peerDependencies": {
@@ -60,7 +69,8 @@
     "@deepseek-ai/dsh-skill": "*",
     "@deepseek-ai/dsh-llm": "*",
     "@deepseek-ai/dsh-subagent": "*",
-    "@deepseek-ai/dsh-agent": "*"
+    "@deepseek-ai/dsh-agent": "*",
+    "react": "^18.2.0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": { "optional": true },
@@ -68,10 +78,13 @@
     "@deepseek-ai/dsh-skill": { "optional": true },
     "@deepseek-ai/dsh-llm": { "optional": true },
     "@deepseek-ai/dsh-subagent": { "optional": true },
-    "@deepseek-ai/dsh-agent": { "optional": true }
+    "@deepseek-ai/dsh-agent": { "optional": true },
+    "react": { "optional": true }
   },
   "devDependencies": {
     "@types/node": "^22.20.0",
+    "@types/react": "~18.3.1",
+    "react": "^18.2.0",
     "tsdown": "^0.15.6",
     "typescript": "^5.9.3"
   }

@@ -26,3 +26,10 @@ export const TOOL_OVERLAY_WRITE = 'pstack_overlay_write'
 
 /** Default in-process spawn provider. `packages/bundle/base/cordis.patch.yml` `providerName: spawn`. */
 export const SPAWN_PROVIDER = 'spawn'
+
+/** Settings nav id. Official slot `settings.section` (`packages/client/ui-settings/src/client/contract/slots.ts`). */
+export const SETTINGS_SECTION_ID = 'pstack'
+
+/** Same-origin Web routes. Pattern: dsh-oauth-login `src/auth-routes.ts`. */
+export const SETTINGS_SNAPSHOT_PATH = '/plugins/pstack-dsh/settings'
+export const SETTINGS_SAVE_PATH = '/plugins/pstack-dsh/settings'
