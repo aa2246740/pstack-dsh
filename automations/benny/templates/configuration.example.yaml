@@ -62,7 +62,7 @@ status_emoji:
   reproducing: "🔎"
   reproduced: "✅"
   could_not_reproduce: "⚪"
-  blocked: "🚫"
+  blocked: "⛔"
   fixing: "🛠️"
   fix_failed: "❌"
   pull_request_opened: "🔗"
