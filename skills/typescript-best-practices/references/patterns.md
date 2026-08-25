@@ -129,7 +129,7 @@ External sources include RPC payloads, `JSON.parse`, `postMessage`, IPC, file co
 
 ## No `as` casts
 
-Every `as` is a potential runtime crash. Cast only after validation.
+Every `as` is a potential runtime crash. Cast only after the type system has verified the claim.
 
 ```ts
 // Don't
