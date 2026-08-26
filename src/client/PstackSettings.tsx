@@ -20,6 +20,7 @@ import {
 import { PANEL_ROLES, type PstackRole } from '../roles.ts'
 import { loadSettingsSnapshot, saveSettingsOverlay } from './api.ts'
 import type { PstackSettingsKey } from './locales.ts'
+import { potetoNoteCopy } from './poteto-defaults.ts'
 
 const STYLE_ID = 'pstack-dsh-settings-theme'
 
@@ -79,6 +80,15 @@ function ensureThemeStyles(): void {
 
 function overlaysEqual(left: Overlay, right: Overlay): boolean {
   return JSON.stringify(left) === JSON.stringify(right)
+}
+
+function RoleHead({ role, t }: { role: PstackRole; t: PstackSettingsInjected['t'] }) {
+  return (
+    <div className="pstack-card-head">
+      <p className="pstack-role">{role}</p>
+      <p className="pstack-note">{potetoNoteCopy(role, t('potetoPrefix'))}</p>
+    </div>
+  )
 }
 
 function firstSelectable(routes: readonly LiveRoute[]): OverlayRoute | undefined {
@@ -316,10 +326,7 @@ export function PstackSettings({ t }: PstackSettingsProps) {
                       const route = draft.routes[0]
                       return (
                         <article key={role} className="pstack-card">
-                          <div className="pstack-card-head">
-                            <p className="pstack-role">{role}</p>
-                            <p className="pstack-note">{draft.inherit ? t('inheritHint') : null}</p>
-                          </div>
+                          <RoleHead role={role} t={t} />
                           <div className="pstack-fields">
                             <div className="pstack-field">
                               <label className="pstack-label" htmlFor={`pstack-role-${role}`}>{role}</label>
@@ -352,10 +359,7 @@ export function PstackSettings({ t }: PstackSettingsProps) {
                     const rows = draft.inherit ? [] : draft.routes
                     return (
                       <article key={role} className="pstack-card">
-                        <div className="pstack-card-head">
-                          <p className="pstack-role">{role}</p>
-                          <p className="pstack-note">{t('panelHint')}</p>
-                        </div>
+                        <RoleHead role={role} t={t} />
                         {draft.inherit
                           ? (
                               <div className="pstack-field">
