@@ -1,6 +1,8 @@
 declare module '@deepseek-ai/dsh-client-runtime/client' {
   export interface ClientContext {
     effect(fn: () => (() => void) | void, label?: string): void
+    on(event: 'connection/reset', listener: () => void): () => void
+    remote: import('./api.ts').CatalogEventContext['remote']
     locale: {
       register(ns: string, dicts: { zh: unknown; en: unknown }): () => void
       bind(ns: string): (key: string, params?: Record<string, unknown>) => string

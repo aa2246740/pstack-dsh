@@ -23,7 +23,7 @@ describe('bundle composition', () => {
   it('registers settings.section id pstack from the client entry', async () => {
     const source = await readFile(join(root, 'src/client/index.tsx'), 'utf8')
     assert.match(source, /export function apply/)
-    assert.match(source, /export const inject = \['slots', 'locale'\]/)
+    assert.match(source, /export const inject = \['slots', 'locale', 'remote'\]/)
     assert.doesNotMatch(source, /export\s+default\s+/)
     assert.match(source, /settings\.section/)
     assert.match(source, /SETTINGS_SECTION_ID/)

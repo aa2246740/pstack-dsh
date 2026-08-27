@@ -9,6 +9,7 @@ import type { PstackSettingsInjected } from './PstackSettings.tsx'
 import { en, zh } from './locales.ts'
 import type { PstackSettingsKey } from './locales.ts'
 import { SETTINGS_SECTION_ID } from '../ids.ts'
+import { listenForCatalogChanges } from './api.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -17,17 +18,19 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 export const name = 'pstack-dsh-client'
-export const inject = ['slots', 'locale']
+export const inject = ['slots', 'locale', 'remote']
 
 export function apply(ctx: ClientContext): void {
   const namespace = 'settings.pstack'
   ctx.effect(() => ctx.locale.register(namespace, { zh, en }), 'pstack-dsh: settings copy')
   const t = ctx.locale.bind(namespace) as PstackSettingsInjected['t']
+  const subscribeCatalogChanges: PstackSettingsInjected['subscribeCatalogChanges'] = listener =>
+    listenForCatalogChanges(ctx, listener)
   ctx.slots.inject('settings.section', () => ctx.slots.register({
     name: 'settings.section',
     id: SETTINGS_SECTION_ID,
     order: 16,
     label: () => t('nav'),
-    inject: (): PstackSettingsInjected => ({ t }),
+    inject: (): PstackSettingsInjected => ({ t, subscribeCatalogChanges }),
   }, PstackSettings))
 }

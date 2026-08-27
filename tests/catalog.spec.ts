@@ -139,4 +139,37 @@ describe('buildCatalog', () => {
     assert.equal(catalog.routes[0]?.efforts.length, 0)
     assert.equal(catalog.recommendOauthLogin, false)
   })
+
+  it('discovers new login providers without a duplicated provider allowlist', async () => {
+    const home = await mkdtemp(join(tmpdir(), 'pstack-dsh-new-provider-'))
+    await writeFile(join(home, OAUTH_AUTH_FILENAME), JSON.stringify({
+      credentials: {
+        'zai-coding-cn': { key: 'fixture-secret' },
+        'future-provider': {},
+        'not-registered': {},
+      },
+    }))
+    const catalog = await buildCatalog({
+      dshHome: home,
+      env: {},
+      llm: llmStub({
+        providers: [
+          { id: 'pi-zai-coding-cn', name: 'GLM' },
+          { id: 'pi-future-provider', name: 'Future provider' },
+          { id: 'pi-signed-out', name: 'Signed out' },
+          { id: 'zai-coding-cn', name: 'Unrelated adapter' },
+        ],
+        models: {
+          'pi-zai-coding-cn': [{ id: 'glm-5.3-flash', name: 'GLM' }],
+          'pi-future-provider': [{ id: 'live-model', name: 'Live model' }],
+          'pi-signed-out': [{ id: 'not-selectable', name: 'Not selectable' }],
+          'zai-coding-cn': [{ id: 'not-selectable', name: 'Not selectable' }],
+        },
+      }),
+    })
+    assert.deepEqual(catalog.routes.filter(route => route.selectable).map(route => route.provider), [
+      'pi-zai-coding-cn', 'pi-future-provider',
+    ])
+    assert.doesNotMatch(JSON.stringify(catalog), /fixture-secret/)
+  })
 })

@@ -18,10 +18,16 @@ declare module '@deepseek-ai/cordis' {
 }
 
 declare module '@deepseek-ai/dsh-tools' {
+  export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue }
+
   export function defineTool(definition: {
     name: string
     description: string
     parameters: Record<string, unknown>
-    execute: (args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }) => Promise<unknown>
+    output: {
+      schema: { type: string }
+      render: (args: unknown, value: JsonValue) => unknown[]
+    }
+    execute: (args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }) => Promise<JsonValue>
   }): unknown
 }

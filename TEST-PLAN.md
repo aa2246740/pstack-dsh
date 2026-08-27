@@ -56,10 +56,15 @@ This cloud checkout ran `dshx check` green. `dshx verify-boot pstack-dsh --port 
 
 ## Manual Settings (EDITH / local DSH Web)
 
-After `dsh plugin add ./pstack-dsh` and a **page reload**:
+After the bundle has been activated on the intended Host (initial bundle installation requires an authorized Host restart):
 
 1. Open Settings (sidebar gear) → **pstack** / **pstack 角色**.
 2. With no keys and no oauth store: inherit-only, oauth recommend line, Save still writes inherit overlay.
-3. Add `DEEPSEEK_API_KEY` (or another logged-in adapter). Reload the page. The page lists only that route. Effort options match `resolveModelInfo` or are omitted.
+3. Add `DEEPSEEK_API_KEY` or sign in through dsh-oauth-login. The role selector updates from Host notifications, without a page reload. Effort options match `resolveModelInfo` or are omitted.
 4. Save. `$DSH_HOME/pstack-dsh.json` matches the form. `pstack_spawn` does not grow `model` / `reasoning_effort` fields.
 5. `/setup-pstack` only points at Settings → pstack. It does not run a TUI picker.
+6. Leave role/effort edits unsaved, then refresh models or receive a login/logout notification. Choices update; drafts and Save's dirty state remain. A selected route that disappears is marked unavailable rather than silently displaying inherit.
+
+`node tests/settings-refresh.browser.mjs [candidate/lib/client.js]` checks these UI behaviors on the existing `127.0.0.1:43127` Host using the globally pinned Playwright runtime. Snapshot responses and Host notifications are simulated only in that test page; no login, saved overlay or server process is changed. Supplying a candidate bundle tests it before live publication.
+
+Client builds use dshx `externalClientBundle`; configure matching `DSHX_HARNESS` / `~/.config/dshx/harness` paths before `npm run check`.

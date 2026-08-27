@@ -1,6 +1,6 @@
 /** Plugin-owned pstack page inside the official Settings shell. */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { LiveRoute } from '../catalog-types.ts'
 import type { Overlay, OverlayRoute } from '../overlay-model.ts'
@@ -26,6 +26,7 @@ const STYLE_ID = 'pstack-dsh-settings-theme'
 
 export interface PstackSettingsInjected {
   t: (key: PstackSettingsKey, params?: Record<string, unknown>) => string
+  subscribeCatalogChanges: (listener: () => void) => () => void
 }
 
 export type PstackSettingsProps = Partial<PstackSettingsInjected>
@@ -127,6 +128,9 @@ function EffortSelect({
         }}
       >
         <option value="">{t('effortOmit')}</option>
+        {route.reasoningEffort !== undefined && !found.efforts.some(effort => effort.id === route.reasoningEffort)
+          ? <option value={route.reasoningEffort} disabled>{route.reasoningEffort} · {t('unavailable')}</option>
+          : null}
         {found.efforts.map(effort => (
           <option key={effort.id} value={effort.id}>{effort.name || effort.id}</option>
         ))}
@@ -155,6 +159,9 @@ function RouteSelect({
     <select id={id} className="pstack-select" value={value} disabled={disabled} onChange={event => { onChange(event.target.value) }}>
       <option value="inherit-parent">{t('inheritParent')}</option>
       <option value="auto">{t('auto')}</option>
+      {value !== 'inherit-parent' && value !== 'auto' && !selectable.some(route => routeKey(route.provider, route.model) === value)
+        ? <option value={value} disabled>{value.replace('::', '/')} · {t('unavailable')}</option>
+        : null}
       {selectable.map(route => {
         const key = routeKey(route.provider, route.model)
         return (
@@ -167,7 +174,7 @@ function RouteSelect({
   )
 }
 
-export function PstackSettings({ t }: PstackSettingsProps) {
+export function PstackSettings({ t, subscribeCatalogChanges }: PstackSettingsProps) {
   if (t === undefined) throw new Error('pstack settings requires its translation function')
   const [drafts, setDrafts] = useState<RoleDraft[] | undefined>(undefined)
   const [saved, setSaved] = useState<Overlay | undefined>(undefined)
@@ -177,29 +184,55 @@ export function PstackSettings({ t }: PstackSettingsProps) {
   const [selectableCount, setSelectableCount] = useState(0)
   const [dropped, setDropped] = useState<string[]>([])
   const [error, setError] = useState<string | undefined>(undefined)
+  const [catalogError, setCatalogError] = useState<string | undefined>(undefined)
   const [notice, setNotice] = useState<string | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  const initialized = useRef(false)
+  const catalogRequest = useRef<AbortController | undefined>(undefined)
 
   useEffect(() => { ensureThemeStyles() }, [])
 
   const refresh = useCallback(async () => {
+    catalogRequest.current?.abort()
+    const request = new AbortController()
+    catalogRequest.current = request
     try {
-      const snapshot = await loadSettingsSnapshot()
+      const snapshot = await loadSettingsSnapshot(request.signal)
+      if (request.signal.aborted) return
       setLive(snapshot.catalog.routes)
       setSelectableCount(snapshot.catalog.selectableCount)
       setRecommendOauth(snapshot.catalog.recommendOauthLogin)
       setPath(snapshot.path)
-      setSaved(snapshot.overlay)
-      setDrafts(overlayToDraft(snapshot.overlay))
-      setDropped(snapshot.droppedRoles)
-      setError(undefined)
-      setNotice(undefined)
+      // Login/model notifications must never replace the user's in-progress
+      // role choices (or the baseline used to decide whether Save is enabled).
+      if (!initialized.current) {
+        setSaved(snapshot.overlay)
+        setDrafts(overlayToDraft(snapshot.overlay))
+        setDropped(snapshot.droppedRoles)
+        initialized.current = true
+      }
+      setCatalogError(undefined)
     } catch (caught: unknown) {
-      setError(caught instanceof Error ? caught.message : t('requestFailed'))
+      if (!request.signal.aborted) {
+        setCatalogError(caught instanceof Error ? caught.message : t('requestFailed'))
+      }
     }
   }, [t])
 
-  useEffect(() => { void refresh() }, [refresh])
+  useEffect(() => {
+    const reload = () => { void refresh() }
+    const visible = () => { if (document.visibilityState === 'visible') reload() }
+    const stop = subscribeCatalogChanges?.(reload)
+    window.addEventListener('focus', reload)
+    document.addEventListener('visibilitychange', visible)
+    reload()
+    return () => {
+      stop?.()
+      window.removeEventListener('focus', reload)
+      document.removeEventListener('visibilitychange', visible)
+      catalogRequest.current?.abort()
+    }
+  }, [refresh, subscribeCatalogChanges])
 
   const currentOverlay = useMemo(() => drafts === undefined ? undefined : draftToOverlay(drafts), [drafts])
   const dirty = saved !== undefined && currentOverlay !== undefined && !overlaysEqual(saved, currentOverlay)
@@ -251,10 +284,17 @@ export function PstackSettings({ t }: PstackSettingsProps) {
   }
 
   return (
-    <section className="pstack-page" aria-labelledby="pstack-settings-title">
+    <section
+      className="pstack-page"
+      aria-labelledby="pstack-settings-title"
+      onFocusCapture={event => { if (event.target instanceof HTMLSelectElement) void refresh() }}
+      onPointerDownCapture={event => { if (event.target instanceof HTMLSelectElement) void refresh() }}
+    >
       <h2 id="pstack-settings-title" className="pstack-title">{t('title')}</h2>
       <p className="pstack-intro">{t('intro')}</p>
+      <p className="pstack-note">{t('catalogUpdates')}</p>
       {error !== undefined ? <p className="pstack-error">{error}</p> : null}
+      {catalogError !== undefined ? <p className="pstack-error">{catalogError}</p> : null}
       {notice !== undefined ? <p className="pstack-ok" role="status">{notice}</p> : null}
       {dropped.length > 0 ? <p className="pstack-warn">{t('dropped')}</p> : null}
       {drafts === undefined

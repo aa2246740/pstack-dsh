@@ -4,7 +4,7 @@
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool } from '@deepseek-ai/dsh-tools'
+import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
 import { PLUGIN_ID, SPAWN_PROVIDER } from './ids.ts'
 import { Config, type Config as PluginConfig } from './plugin-config.ts'
 import { createSkillProvider } from './skills-provider.ts'
@@ -23,6 +23,11 @@ export const inject = ['tools', 'skills']
 export { Config }
 export type { PluginConfig as ConfigType }
 
+const JSON_OUTPUT = {
+  schema: { type: 'json' as const },
+  render: (_args: unknown, value: JsonValue) => [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
+}
+
 function asHost(ctx: Context, config: PluginConfig | undefined, roles: RoleEffortMap): ToolHost {
   return {
     get llm() { return ctx.get('llm') as ToolHost['llm'] },
@@ -39,8 +44,9 @@ function registerOne(ctx: Context, tool: ReturnType<typeof catalogTool>): void {
     name: tool.name,
     description: tool.description,
     parameters: tool.parameters,
+    output: JSON_OUTPUT,
     async execute(args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }) {
-      return tool.execute(args, exec)
+      return await tool.execute(args, exec) as JsonValue
     },
   }))
 }

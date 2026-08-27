@@ -10,11 +10,31 @@ export interface SettingsSnapshot {
   droppedRoles: string[]
 }
 
-async function jsonRequest<T>(path: string, method: string, body?: unknown): Promise<T> {
+type CatalogEvent = 'llm/adapters-updated' | 'settings/document-updated' | 'credentials/reference-updated'
+
+export interface CatalogEventContext {
+  remote: { $on(event: CatalogEvent, listener: () => void): () => void }
+  on(event: 'connection/reset', listener: () => void): () => void
+}
+
+/** Use the same Host notifications as DSH's model directory, scoped to the open settings page. */
+export function listenForCatalogChanges(ctx: CatalogEventContext, listener: () => void): () => void {
+  const disposers = [
+    ctx.remote.$on('llm/adapters-updated', listener),
+    ctx.remote.$on('settings/document-updated', listener),
+    ctx.remote.$on('credentials/reference-updated', listener),
+    ctx.on('connection/reset', listener),
+  ]
+  return () => { for (const dispose of disposers) dispose() }
+}
+
+async function jsonRequest<T>(path: string, method: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   const response = await fetch(path, {
     method,
     headers: { accept: 'application/json', ...body === undefined ? {} : { 'content-type': 'application/json' } },
     credentials: 'same-origin',
+    cache: 'no-store',
+    signal,
     ...body === undefined ? {} : { body: JSON.stringify(body) },
   })
   const value: unknown = await response.json().catch(() => undefined)
@@ -27,8 +47,8 @@ async function jsonRequest<T>(path: string, method: string, body?: unknown): Pro
   return value as T
 }
 
-export function loadSettingsSnapshot(): Promise<SettingsSnapshot> {
-  return jsonRequest<SettingsSnapshot>(SETTINGS_SNAPSHOT_PATH, 'GET')
+export function loadSettingsSnapshot(signal?: AbortSignal): Promise<SettingsSnapshot> {
+  return jsonRequest<SettingsSnapshot>(SETTINGS_SNAPSHOT_PATH, 'GET', undefined, signal)
 }
 
 export function saveSettingsOverlay(overlay: Overlay): Promise<{ path: string; overlay: Overlay }> {

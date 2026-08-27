@@ -32,6 +32,7 @@ export interface CatalogResult {
   readonly emptyReason?: string
 }
 
+/** Hints for known logins whose adapter is missing; not an allowlist for live adapters. */
 export const OAUTH_ROUTE_BY_STORE_ID: Readonly<Record<string, string>> = {
   'openai-codex': 'pi-openai-codex',
   anthropic: 'pi-anthropic',
@@ -42,8 +43,8 @@ export const OAUTH_ROUTE_BY_STORE_ID: Readonly<Record<string, string>> = {
 }
 
 export function storeIdForRoute(route: string): string | undefined {
-  for (const [id, mapped] of Object.entries(OAUTH_ROUTE_BY_STORE_ID)) {
-    if (mapped === route) return id
-  }
-  return undefined
+  // dsh-oauth-login publishes pi-<credential-store-id>. buildCatalog calls this
+  // only for registered adapters and separately requires that exact login id.
+  // New login providers must not need a second registration in pstack.
+  return route.startsWith('pi-') && route.length > 3 ? route.slice(3) : undefined
 }
