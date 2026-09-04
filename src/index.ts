@@ -4,7 +4,12 @@
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
+import type {} from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-host-webserver'
+import { ReasoningEffortId } from '@deepseek-ai/dsh-llm'
+import type {} from '@deepseek-ai/dsh-skill'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+import { snapshotJsonValue, type JsonValue } from '@deepseek-ai/dsh-util-values'
 import { PLUGIN_ID, SPAWN_PROVIDER } from './ids.ts'
 import { Config, type Config as PluginConfig } from './plugin-config.ts'
 import { createSkillProvider } from './skills-provider.ts'
@@ -45,8 +50,10 @@ function registerOne(ctx: Context, tool: ReturnType<typeof catalogTool>): void {
     description: tool.description,
     parameters: tool.parameters,
     output: JSON_OUTPUT,
-    async execute(args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }) {
-      return await tool.execute(args, exec) as JsonValue
+    async execute(args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }): Promise<JsonValue> {
+      const snapshot = snapshotJsonValue(await tool.execute(args, exec))
+      if (snapshot === undefined) throw new TypeError(`pstack tool ${tool.name} returned a non-JSON value`)
+      return snapshot as JsonValue
     },
   }))
 }
@@ -64,13 +71,7 @@ export function apply(ctx: Context, config?: PluginConfig): void {
     registerPstackSettingsRoutes(webCtx, host)
   })
 
-  const events = ctx as Context & {
-    on(event: string, listener: (...args: never[]) => unknown): unknown
-  }
-  events.on('agent/request', (async (
-    payload: { agent: { id: string } },
-    next: () => Promise<{ provider: string; model: string; reasoningEffort?: string }>,
-  ) => {
+  ctx.on('agent/request', async (payload, next) => {
     const base = await next()
     const binding = roles.lookup(payload.agent.id)
     if (binding === undefined) return base
@@ -78,7 +79,7 @@ export function apply(ctx: Context, config?: PluginConfig): void {
       ...base,
       ...binding.provider ? { provider: binding.provider } : {},
       ...binding.model ? { model: binding.model } : {},
-      ...binding.reasoningEffort ? { reasoningEffort: binding.reasoningEffort } : {},
+      ...binding.reasoningEffort ? { reasoningEffort: ReasoningEffortId(binding.reasoningEffort) } : {},
     }
-  }) as never)
+  })
 }

@@ -1,7 +1,5 @@
 import { Context } from "@deepseek-ai/cordis";
-
 //#region src/plugin-config.d.ts
-
 /**
  * Standard Schema v1 Config. Loader validates before apply.
  * Avoids a hard schemastery import so the package still typechecks without DSH.

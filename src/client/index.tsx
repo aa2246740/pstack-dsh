@@ -1,9 +1,11 @@
 /** Browser half: pstack roles inside official DSH Settings. */
 
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-connection/client'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
-import type {} from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { PstackSettings } from './PstackSettings.tsx'
 import type { PstackSettingsInjected } from './PstackSettings.tsx'
 import { en, zh } from './locales.ts'
@@ -20,10 +22,10 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 export const name = 'pstack-dsh-client'
 export const inject = ['slots', 'locale', 'remote']
 
-export function apply(ctx: ClientContext): void {
+export function apply(ctx: Context): void {
   const namespace = 'settings.pstack'
   ctx.effect(() => ctx.locale.register(namespace, { zh, en }), 'pstack-dsh: settings copy')
-  const t = ctx.locale.bind(namespace) as PstackSettingsInjected['t']
+  const t: PstackSettingsInjected['t'] = ctx.locale.bind(namespace)
   const subscribeCatalogChanges: PstackSettingsInjected['subscribeCatalogChanges'] = listener =>
     listenForCatalogChanges(ctx, listener)
   ctx.slots.inject('settings.section', () => ctx.slots.register({

@@ -1,3 +1,4 @@
+import type { ParameterSchemaSpec } from '@deepseek-ai/dsh-tools'
 import type { CatalogHost } from './catalog.ts'
 import { buildCatalog } from './catalog.ts'
 import {
@@ -23,7 +24,7 @@ import {
 export interface ToolDefinition {
   name: string
   description: string
-  parameters: Record<string, unknown>
+  parameters: ParameterSchemaSpec
   execute(args: Record<string, unknown>, exec: { signal?: AbortSignal; agent?: { id: string } }): Promise<unknown>
 }
 
