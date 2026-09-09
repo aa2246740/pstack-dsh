@@ -2,7 +2,8 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { parseSkillMarkdown } from '../src/frontmatter.ts'
 import { emptyOverlay, parseOverlay } from '../src/overlay.ts'
-import { applyRoleConfig } from '../src/request-overlay.ts'
+import { applyRoleConfig, RoleEffortMap } from '../src/request-overlay.ts'
+import { spawnTool, type SubagentHandle } from '../src/tools.ts'
 import { normalizeRole } from '../src/roles.ts'
 import { resolveSpawn } from '../src/spawn.ts'
 
@@ -69,6 +70,53 @@ describe('resolveSpawn', () => {
     assert.deepEqual(feature.agentOptions, { provider: 'deepseek-official', model: 'deepseek-chat' })
     assert.equal(feature.reasoningEffort, 'high')
   })
+})
+
+describe('retired how-critics spawn', () => {
+  for (const continuable of [false, true]) {
+    for (const background of [undefined, false, true]) {
+      it(`starts zero agents with continuable=${continuable}, background=${background}`, async () => {
+        let starts = 0
+        let continuableStarts = 0
+        let providerLookups = 0
+        const subagents: SubagentHandle = {
+          async start() {
+            starts += 1
+            return { id: 'unexpected-child', result: Promise.resolve({ output: 'unexpected' }) }
+          },
+          getProvider() {
+            providerLookups += 1
+            return continuable ? { prepareContinuable: true } : {}
+          },
+          ...(continuable ? {
+            async startContinuable() {
+              continuableStarts += 1
+              return { childId: 'unexpected-continuable' }
+            },
+          } : {}),
+        }
+        const roles = new RoleEffortMap()
+        const tool = spawnTool({ subagents, roles })
+        const result = await tool.execute({
+          role: 'how-critics',
+          description: 'Legacy critic request',
+          prompt: 'Review this design',
+          ...(background === undefined ? {} : { run_in_background: background }),
+          route_index: 1,
+        }, { agent: { id: 'parent' } })
+        assert.deepEqual(result, {
+          kind: 'disabled',
+          role: 'how-critics',
+          reason: 'how-critics was retired in pstack 0.15; no agent was started.',
+        })
+        assert.equal(starts, 0)
+        assert.equal(continuableStarts, 0)
+        assert.equal(providerLookups, 0)
+        assert.equal(roles.lookup('unexpected-child'), undefined)
+        assert.equal(roles.lookup('unexpected-continuable'), undefined)
+      })
+    }
+  }
 })
 
 describe('applyRoleConfig', () => {

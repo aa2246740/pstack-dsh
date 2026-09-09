@@ -53,7 +53,7 @@ export function catalogTool(host: ToolHost): ToolDefinition {
   return {
     name: TOOL_CATALOG,
     description:
-      'List live DSH LLM routes pstack may use: registered adapters with a logged-in API key, plus dsh-oauth-login store routes that are already signed in. Never a vendor catalog. Secrets are omitted.',
+      'List live DSH LLM routes pstack may use: registered adapters with a logged-in API key, plus OAuth store routes (dsh-oauth-login, dsh-antigravity-oauth) that are already signed in. Never a vendor catalog. Secrets are omitted.',
     parameters: {},
     async execute(_args, exec) {
       return buildCatalog({
@@ -152,6 +152,9 @@ export function spawnTool(host: ToolHost): ToolDefinition {
       const subagents = host.subagents
       if (subagents === undefined) throw new Error('pstack_spawn requires ctx.subagents')
       const role = normalizeRole(String(args.role ?? ''))
+      if (role === 'how-critics') {
+        return { kind: 'disabled', role, reason: 'how-critics was retired in pstack 0.15; no agent was started.' }
+      }
       if (!isPstackRole(role) && role.length === 0) throw new Error('pstack_spawn role is required')
       const overlay: Overlay = (await readOverlay(host.dshHome ?? resolveDshHome(host.env))).overlay
       const resolved = resolveSpawn(overlay, {

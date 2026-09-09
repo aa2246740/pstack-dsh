@@ -50,6 +50,19 @@ describe('skill call sites', () => {
     assert.deepEqual(hits, [])
   })
 
+  it('does not invoke the retired how-critics role from skills', async () => {
+    const hits: string[] = []
+    for (const file of await walkMd(SKILLS)) {
+      const text = await readFile(file, 'utf8')
+      // Match JSON, YAML, and JavaScript role arguments while allowing retirement notes.
+      if (/["']?role["']?\s*[:=]\s*["'`]?how-critics\b/.test(text)
+        || /pstack_spawn[^\n]*\bhow-critics\b/.test(text)) {
+        hits.push(file.slice(ROOT.length + 1))
+      }
+    }
+    assert.deepEqual(hits, [])
+  })
+
   it('registers poteto-mode as kebab-case', async () => {
     const provider = createSkillProvider(SKILLS)
     const listed = await provider.list()

@@ -1,20 +1,17 @@
-/**
- * Official Cursor `/setup-pstack` SKILL.md step 5 defaults, shown as Settings copy.
- * Not picker options. independent-verifier / poteto-agent / comment-sicko have no line.
- */
 import type { PstackRole } from '../roles.ts'
 
+// Upstream 0.15 recommendations are display copy, never runtime route defaults.
 const GROK = 'grok-4.6-fast-xhigh'
 const SOL = 'gpt-5.6-sol-max'
-const FABLE = 'claude-fable-5-thinking-max'
+const FABLE = 'claude-fable-5-1-thinking-max'
 const PANEL = `${FABLE}, ${SOL}, ${GROK}, claude-opus-5-thinking-xhigh`
 
 export const POTETO_DEFAULT_SLUGS = {
   feature: GROK,
   refactoring: GROK,
-  'bug-fix': SOL,
-  'perf-issue': SOL,
-  hillclimb: SOL,
+  'bug-fix': FABLE,
+  'perf-issue': FABLE,
+  hillclimb: FABLE,
   'judgment-and-prose': FABLE,
   'hardest-tasks': FABLE,
   'how-explorer': GROK,
@@ -27,7 +24,7 @@ export const POTETO_DEFAULT_SLUGS = {
   'independent-verifier': '',
   'poteto-agent': '',
   'comment-sicko': '',
-  'how-critics': PANEL,
+  'how-critics': '',
   'arena-runners': PANEL,
   'arena-cross-judge-pool': PANEL,
   'architect-runners': PANEL,

@@ -32,15 +32,15 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 ### Arm the program
 
 - [ ] State the protocol and this plan to the operator, then stop. Start execution only on her explicit go.
-- [ ] On her go, arm a `/goal` with this exact text. "<The plan path, the PR ids in order, the verification rule, who merges, and the done condition.>"
+- [ ] On her go, use `create_goal` with this exact objective. "<The plan path, the PR ids in order, the verification rule, who merges, and the done condition.>" Read `get_goal` before updating an existing goal's exact id and revision.
 - [ ] Read these from trunk at program start. Re-read them at every tick.
   - [ ] `git show origin/main:pstack/skills/poteto-mode/playbooks/<execution playbook>.md`
   - [ ] `git show origin/main:pstack/skills/swarm/SKILL.md`
   - [ ] `git show origin/main:<control skill path>`
   - [ ] `git show origin/main:pstack/skills/poteto-mode/playbooks/opening-a-pr.md`
   - [ ] `git show origin/main:pstack/skills/<each other leaf skill the program uses>`
-- [ ] Arm the 30-minute audit tick. In a local session, a real terminal `/loop`. In a cloud root, a cloud-sleeper wake chain. Never leave the cadence to memory.
-- [ ] Use this tick prompt, verbatim. "Re-read the execution playbook from trunk and the armed /goal. Audit the operation against both and fix drift in this tick. Probe every active lane and judge progress by side effects only. Stand down a stuck lane and dispatch its replacement now. Then send the operator a status message, whether or not anything changed, with the queue table of PR, owner, state, and head SHA, the verdicts since the last tick, what merged, open operator gates, and blockers."
+- [ ] Audit at each DSH goal continuation and completion notification. Goal continuation is not a timed scheduler. Do not promise a 30-minute wake.
+- [ ] Use this audit prompt. "Re-read the installed execution playbook and call get_goal. Audit the operation against both and fix drift. Probe every active lane and judge progress by side effects. Investigate a stuck lane and confirm it has stopped writing before assigning its files to a replacement. Send the operator a status message with the queue table of PR, owner, state, and head SHA, the new verdicts, what merged, open operator gates, and blockers."
 - [ ] On the operator's hold or stand-down, send every owner a zero-writes order at once.
 
 ### Spawn owners
@@ -54,7 +54,8 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ### PR mechanics, for every PR
 
-- [ ] Open the PR ready, never draft, with `gh pr create` and `draft: false`, or with Graphite `gt` for a stack.
+- [ ] Resolve the forge once. Default to `gh`. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr` for every PR operation. Record any fallback to `gh`. Never require `gt`.
+- [ ] Open the PR ready, never draft, with `origin pr create --status open --base <base-branch>` or `gh pr create --base <base-branch>` according to the resolved forge. A stack child targets its parent branch.
 - [ ] Run the repo's lint and typecheck once before the PR-facing push. Push with hooks on.
 - [ ] Run `/unslop` before each commit and `/no-comments` before review.
 - [ ] Triage every Bugbot and security-reviewer comment per `../references/bugbot-triage.md`.
@@ -99,7 +100,7 @@ Each live lane runs in its own worktree (parent-created) at the PR head. Drive t
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes at the PR head, per the boot recipe. Overlay `swarm-workers` or inherit.
 
-- [ ] Lane 1. <Scenario.> Save `<slug>.png`. Pass when <predicate>.
+- [ ] Lane 1. Regression lane against trunk. Run <the same load-bearing scenario> at trunk and head. If trunk lacks the feature, record that and gate <the behavior the diff adds plus the end state the user waits for>. Save `<slug>.png`. Pass when <predicate>.
 - [ ] Lane 2. <Scenario.> Save `<slug>.png`. Pass when <predicate>.
 - [ ] Lane 3. <Scenario.> Save `<slug>.png`. Pass when <predicate>.
 - [ ] Lane 4. <Scenario.> Save `<slug>.png`. Pass when <predicate>.
@@ -112,10 +113,10 @@ Each live lane runs in its own worktree (parent-created) at the PR head. Drive t
 
 **Verify, perf.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Metric. <What is measured.>
-- [ ] Probe. <The command or procedure, run at trunk and at the head, interleaved.>
+- [ ] Metric. <What is measured at both trunk and head. If trunk lacks the feature, also name the diff-added work and the end-to-end state the user waits for.>
+- [ ] Probe. <The command or procedure, run at trunk and at the head, interleaved. Both sides must produce the metric.>
 - [ ] Baseline. Record the trunk <value> first.
-- [ ] Rule. <Head against trunk, with the number that fails.>
+- [ ] Rule. <Head against trunk, with the number that fails. If the scenarios differ, add absolute budgets for the diff-added work and the user-visible end state instead of an invalid ratio.>
 
 **Review gate.** The operator reviews before merge.
 
@@ -128,7 +129,7 @@ Each live lane runs in its own worktree (parent-created) at the PR head. Drive t
 - [ ] Root's clean verdict at the exact head SHA.
 - [ ] Bugbot triage done.
 - [ ] Rebased onto current trunk after the verdict, patch-id unchanged.
-- [ ] <The owner squash-merges its own PR, or the root appends the PR to the Graphite stack and the operator lands it.>
+- [ ] <The owner squash-merges its own PR, or the root appends it to the base-branch stack and the operator lands it bottom-up.>
 
 ## Close the program
 

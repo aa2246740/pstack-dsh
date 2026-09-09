@@ -40,7 +40,7 @@ DSH `subagent` has no isolation field. Children share the parent cwd (`packages/
 |---|---|
 | `feature` `refactoring` `bug-fix` `perf-issue` `hillclimb` | playbook code delegates |
 | `judgment-and-prose` `hardest-tasks` | hardest / judgment code |
-| `how-explorer` `how-explainer` `how-critics` | `/how` |
+| `how-explorer` `how-explainer` | `/how` |
 | `why-investigators` `why-synthesizer` | `/why` |
 | `reflect-tooling` `reflect-judgment` | `/reflect` |
 | `swarm-workers` | `/swarm` |
@@ -53,7 +53,7 @@ DSH `subagent` has no isolation field. Children share the parent cwd (`packages/
 
 `generalPurpose` and `Comment Sicko` normalize to `poteto-agent` and `comment-sicko`.
 
-Panel roles (`how-critics`, `arena-runners`, `arena-cross-judge-pool`, `architect-runners`, `interrogate-reviewers`): call `pstack_overlay_read`. If the role inherits, spawn N independent children all inheriting (same route, separate reads). If the role has routes, one `pstack_spawn` per route with `route_index` 0..n-1. Do not invent slugs to fake a panel.
+Panel roles (`arena-runners`, `arena-cross-judge-pool`, `architect-runners`, `interrogate-reviewers`): call `pstack_overlay_read`. If the role inherits, spawn N independent children all inheriting (same route, separate reads). If the role has routes, one `pstack_spawn` per route with `route_index` 0..n-1. Do not invent slugs to fake a panel.
 
 ## Todo and questions
 

@@ -1,13 +1,13 @@
 ### Autonomous run
 
-**You own the exit condition. Define done, then drive to it without stopping.** For "going to bed" / "run until done" / "run until X".
+**You own the exit condition. Define done, then drive to it without stopping.**
 
-1. State the exit condition as a checkable predicate before the first iteration (tests green, repro fixed, all N PRs merged, pixel-diff zero). A vague goal stalls; a predicate lets you stop.
-2. Pick the wake mechanism. If `create_goal` is available, use it for a durable predicate. Otherwise keep iterating in this chat on a heartbeat sized to when the result is worth re-checking. DSH has no grok `scheduler_create`.
-3. Each iteration makes the smallest change the evidence justifies, verifies it against the predicate, commits if it advanced, discards changes that didn't help. Belt-and-suspenders that "might help" gets reverted, not left to ride.
+1. State the exit condition as a checkable predicate before the first iteration, such as tests green, repro fixed, all N PRs merged, or pixel-diff zero.
+2. Use DSH goal tools for continued execution of a long-running objective. Call `get_goal` before changing an existing goal. Create one with `create_goal` when none exists, or use `update_goal` to resume it after a direct human request to continue. Follow the tools' lifecycle gates. If goal tools are unavailable, continue in the current turn and leave a checkpoint if execution stops. Do not promise timed wakeups or unattended polling.
+3. Each iteration makes the smallest change the evidence justifies, verifies it against the predicate, commits if it advanced, and discards changes that didn't help.
    Sequence the work via the **sequence-verifiable-units** principle skill, verifying each unit before the next instead of batching checks at the end.
-4. Mid-run discoveries are yours. Address broken skills, related bugs, flaky verifiers, review noise, tooling failures, orphaned follow-ups, and fixable drift yourself via poteto-mode. Put out-of-band fixes in their own PR. Do not park reversible work for the human or use `ask_user_question`. Surface only irreversible actions, genuine product or preference calls no experiment can settle, or a real dead end. Keep the predicate as the main drive, and return to it after each side fix.
-5. Checkpoint every iteration via the **show-me-your-work** skill, a row for what changed and whether the predicate moved. A run with no trail can't be audited or resumed.
-6. Stop when the predicate is met. A plateau is not a stop, so keep going and pivot your approach to push past it. Surface a genuine dead end rather than spinning, and never relax the predicate to declare victory.
+4. Address mid-run discoveries within the authorized scope via poteto-mode. Put out-of-band fixes in their own PR when authorized. Do not park reversible work for the human. Ask only for required permission, irreversible actions, product or preference calls no experiment can settle, or a real dead end. Return to the predicate after each side fix.
+5. Checkpoint every iteration via the **show-me-your-work** skill, a row for what changed and whether the predicate moved.
+6. Stop when the predicate is met and mark the goal complete only after verification. A plateau means pivot, not success. Report a genuine blocker through the goal tools when their gates allow it. Never relax the predicate to declare victory.
 
 **Reply:** the exit condition, iterations run, what landed, what was discarded, final predicate state.

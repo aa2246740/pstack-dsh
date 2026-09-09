@@ -1,29 +1,33 @@
 ### Opening a PR
 
-Invoked at the end of every other playbook.
+Invoked at the end of code-change playbooks when a PR is in scope.
 
-**Worktree.** Work from a git worktree off main; subagents inherit it. Multiple `pstack_spawn` calls on the same branch each get their own worktree, or `git fetch && git reset --hard origin/<branch>` between them. Dirty branch with unrelated work: patch out, fresh worktree, apply. Snarled worktree: reset from main, redo minimally.
+**Worktree.** Work from a git worktree off trunk. Give each concurrent `pstack_spawn` writer its own worktree and an explicit path. Preserve unrelated work before moving to a fresh worktree. Do not reset a shared or dirty branch to repair a collision.
 
-**Commits.** Commit liberally; rebase into small, ordered commits before opening PRs. Each commit is a future PR: landable, ordered to tell the story. Amend when the fix belongs in a just-made commit; new commit when separable.
+**Commits.** Commit liberally. Rebase into small, ordered commits before opening PRs. Each commit is landable. Amend when the fix belongs in a just-made commit. Make a new commit when separable.
 
 **PRs.** Run `/unslop` over the diff before commit. Run `/no-comments` before review. Write every PR title, PR description, and commit body with `/technical-writing`, then apply `/unslop`. Apply every technical-writing layer except Diátaxis. Use one word for each action, keep articles, and avoid `-ing` when a plain verb works.
 
-**Titles.** Use Conventional Commits in the form `type(scope): subject`. Use `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `perf` as the type. Use the changed area, such as `pstack` or `poteto-mode`, as the scope. Keep the subject short and imperative. Apply the same `/technical-writing` and `/unslop` pass as the body. Name a real symbol when one carries the change. For example, `fix(pstack): retarget opening-a-pr babysit trigger`. Do not add a trailing period.
+**Titles.** Use Conventional Commits in the form `type(scope): subject`. Use `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `perf` as the type. Use the changed area, such as `pstack` or `poteto-mode`, as the scope. Keep the subject short and imperative. Name a real symbol when one carries the change. For example, `fix(pstack): retarget opening-a-pr babysit trigger`. Do not add a trailing period.
 
-**Descriptions.** Use these sections in order. Drop a section when it is empty.
+**Descriptions.** The PR body is a briefing, not the lab notebook. A reviewer who has the diff should learn why the change exists, what is out of scope, and how you proved it works. When squash-merging, use the PR body as the commit body. If that would exceed about 40 lines, cut the body.
 
-- `## Why`. State the intent and why this approach fits.
-- `## Scope`. State facts from the diff. Name real symbols and paths. Name both sides of a rename or retarget. State what is in and out when the boundary matters.
-- `## Tradeoffs`. State real choices only. Skip this section when there are none.
-- `## Blast Radius`. State who and what the change touches. Explain why the change is safe or risky. If main is red without the fix, name the continuing cost.
-- `## Verification`. State how you ran each check and its rigor. Name the real path, such as the browser, the CLI, or the targeted tests. State the outcome of each check, not only the command name.
+Use these sections in order. Drop a section when it has nothing to say.
 
-After these sections, attach videos or screenshots when they prove a claim. Do not use `## Summary` or `## Test plan` boilerplate. A commit body does not restate its subject.
+- `## Why`. State intent and approach in one or two short paragraphs. Do not list SHAs, rebase genealogy, or a "based on main" preamble.
+- `## Scope`. List real symbols and paths in bullets. Name both sides of a rename or retarget. State what is in and out only when the boundary matters. Do not write a file-by-file essay.
+- `## Tradeoffs`. Name only rejected alternatives a reviewer would otherwise ask about. Skip when there was no real choice.
+- `## Blast radius`. In one to three sentences, name who or what the change touches and why it is safe or risky. State the continuing cost if trunk stays red without the fix.
+- `## Verification`. Name each real run path and its outcome, such as the browser, CLI, or targeted tests. For performance, report one primary number with its unit in `before → after` form. Link the evidence directory for remaining details. Keep methodology and metric tables there.
 
-**Size and stacks.** Prefer five narrow PRs to one large PR. Stack follow-ups with Graphite (`gt`), and keep the ordered stack visible to reviewers. Branch from main only for independent work. Rebase on `main` before substantial stack work.
+Attach videos or screenshots when they prove a claim. Put full SHAs, per-agent recitals, measurement corrections, file-by-file checklists, and "CLEAN" verdicts in a linked artifact. Do not use `## Summary` or `## Test plan` boilerplate. A commit body does not restate its subject.
 
-**Readiness.** Open every PR ready, never as a draft. If a host tool defaults to draft, mark it ready. If a PR still opens as a draft, run the host's ready command, such as `gh pr ready <number>`. Run `gh pr view <number>` before you refer to PR status.
+**Forge.** Resolve the forge before the first PR operation and keep that choice for create, edit, view, watch, and merge. GitHub CLI, `gh`, is the default. If `command -v origin` succeeds and Origin can resolve the repository, prefer `origin pr ...`. Otherwise stay on `gh` and record the fallback. Do not require Graphite, `gt`.
 
-**Babysit.** Opening a PR does not start a babysit. Post the URL and keep building. Finish the phase or stack first. Run a separate babysit pass only when the user asks for one after the whole stack exists. A babysit for each new PR stalls the build and spends checks on commits that later waves restart. Push back when feedback drifts from intent.
+**Size and stacks.** Prefer five narrow PRs to one large PR. A stack is a base-branch chain. The root PR targets trunk. Each child branch rebases onto its parent's exact tip and its PR targets the parent branch. Create a child with `origin pr create --status open --base <parent-branch>` or `gh pr create --base <parent-branch>` according to the resolved forge. Retarget with `origin pr edit <pr> --base <parent-branch>` or `gh pr edit <pr> --base <parent-branch>`. Branch from trunk only for independent work. Rebase on trunk before substantial stack work.
+
+**Readiness.** Open every PR ready, never as a draft. With Origin, pass `--status open`. With `gh`, omit `--draft`. If a host tool defaults to draft, mark it ready. If a PR still opens as a draft, run `origin pr ready <number>` or `gh pr ready <number>` according to the resolved forge. Run `origin pr view <number>` or `gh pr view <number>` before referring to PR status.
+
+**Babysit.** Opening a PR does not start a babysit. Post the URL and keep building. Finish the phase or stack first. Run a separate babysit pass only when the user asks after the whole stack exists. Push back when feedback drifts from intent.
 
 A subagent that opens a PR runs `interrogate`, `/unslop`, and `/no-comments`. It returns the URL and does not babysit. Return to the parent.
