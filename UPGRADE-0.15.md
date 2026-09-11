@@ -1,39 +1,148 @@
-# 同步 pstack 0.15.0
+# pstack 0.15 text port
 
-## 来源
+## Provenance
 
-上游为 `cursor/plugins` 的 `pstack/`，固定提交 `71ed0d1076fec562c1b74ee353121a8d00f75382`。
+This DSH candidate ports Markdown changes from upstream `cursor/plugins`, `pstack/`, at `71ed0d1076fec562c1b74ee353121a8d00f75382`, version 0.15.0.
 
-以 `bdf7aa355337897f167153e05069aca505dae17c` 的 0.14.3 内容重建比较基线，再逐项保留 DSH 调用适配。这是内容比较基线，不是两个仓库的共同 Git 祖先。
+The comparison base is `bdf7aa355337897f167153e05069aca505dae17c`, upstream 0.14.3. It is a reconstructed content baseline, not a proven common Git ancestor. The research compared DSH commit `193e9e5e4b887da4d5cb1e5acaee7f8e9bc4d44b`. The actual installed source is commit `d95efa39760b8d4691dff37dc68e75ebafffd463` plus local changes captured in `installed-before.tar.gz`. This upgrade preserves those local changes.
 
-主要同步 `e8d856f` 的提示词精简、`d7cde2b` 的标点整理，以及 `71ed0d1` 的文档计数修正。pstack-dsh 的包版本与上游技能版本独立。
+Each text change was compared against both upstream versions and the candidate's DSH adaptation. The main upstream changes are density in `e8d856f`, punctuation in `d7cde2b`, and release counts in `71ed0d1`. The final autopilot chooser remains. This is a DSH port version, not a claim that the DSH package itself is upstream 0.15.0.
 
-## 用户会看到的变化
+## Included
 
-- `how` 保留解释代码的流程。简单问题用一个解释代理，复杂问题先探索再解释；不再启动额外的架构批评代理。
-- `why` 的说明更短，仍调查所有可用证据类别，明确缺口和结论可信度。
-- 新增 Attack the Premise 和 Test Behavior, Not Implementation。现在有 23 条原则和 23 个玩法。
-- 原则技能可通过 DSH 的 `skill` 工具按需加载。`how`、`why`、`unslop` 和 TypeScript 技能仍允许模型调用。
-- 设置页显示 Poteto 0.15 的模型推荐。推荐只用于文字展示，不参与实际路由选择，不覆盖用户的模型、effort 或继承设置。
+- Shorter skill instructions and shared reference templates instead of repeated examples and output formats.
+- An explanation-only `how` flow. Narrow questions use one explainer. Complex questions use explorers followed by an explainer. The critique branch and its two reference files are removed.
+- `why` retains parallel coverage of all available evidence categories, explicit gaps, cited synthesis, and confidence language.
+- Attack the Premise and Test Behavior, Not Implementation. The index now lists 23 principles and 23 playbooks.
+- Model invocation for all `principle-*` skills. `how`, `why`, `unslop`, and `typescript-best-practices` remain callable by the model.
+- Forge-neutral PR guidance where the DSH tools and included scripts support it.
 
-## 兼容处理
+## DSH choices preserved
 
-`how-critics` 保留为可读取的旧配置键，设置页不再显示。保存或批量修改其他角色时保留旧值；旧模型不可用也不会阻止其他角色保存。直接请求这个角色会返回 `disabled`，不会启动代理。
+`pstack_spawn` still receives role keys, not Cursor model slugs or `Task` fields. The DSH overlay selects logged-in routes and reasoning effort. Missing configuration still inherits the parent. This text port does not select models or modify user configuration.
 
-`pstack_spawn` 仍接收 DSH 角色键。模型和推理强度来自用户配置与已登录目录，没有配置就继承父对话。不引入 Cursor 的任务字段、模型配置文件或调度器。
+The locally customized setup instructions and catalog remain. Only the retired how-critic invocation entries are removed from the spawn reference. Handling the old configuration key belongs to the runtime compatibility change, not to these Markdown instructions.
 
-同时保留已安装版本的修复：Antigravity 路由发现、模型目录更新时保留编辑状态、设置接口身份检查，以及配置文件原子写入。
+Long-running work follows the available DSH goal tools and their authorization rules. These docs do not install or promise a Cursor scheduler, cloud-sleeper, or a second Host.
 
-## 未纳入的内容
+## Excluded
 
-- `make-bot-ui` 依赖 Cursor 的 routines/webhook，本次不移植。
-- 不修改 Harness 核心，不自动替用户换模型。
-- PR 说明仅在现有 DSH 工具和脚本支持的范围内吸收 gh/Origin 指导。Orchestrate 仍有 Graphite 使用前提，worktree audit 仍依赖 gh，不宣称完整的跨托管平台适配。
+`make-bot-ui`, Cursor-only invocation restrictions, Cursor cloud/runtime fields, model defaults, logo changes, and Harness core changes are not part of this text port. No installed source or runtime is edited by the Markdown migration.
 
-## 验证
+## Verification boundary
 
-发布前运行类型检查、53 项测试和构建。测试覆盖旧角色配置保留、设置读写、禁用角色不启动代理、新原则可发现与加载。
+Static checks cover principle counts and invocation frontmatter, retired how references, DSH role call sites, and local Markdown links. Build, package tests, runtime role compatibility, promotion, and browser acceptance belong to the parent upgrade process. Passing a text check does not prove live skill behavior or lower task cost. Upstream static token reductions do not establish DSH billing savings.
 
-本地实际验证了同 PID 模块热替换、新原则加载、禁用角色返回值及正常角色调用。页面自动视觉验收尚未完成，不将构建通过当作页面验证通过。
+## Text change manifest
 
-上游提示词的静态体积缩减不等于每次任务的费用缩减。本次不承诺固定节省比例。
+Paths below are relative to this candidate root. There are 100 added or modified Markdown files, including this record and the parent README update, and two deletions.
+
+```text
+HARNESS.md
+README.md
+UPGRADE-0.15.md
+docs/guide/01-setup.md
+docs/guide/02-poteto-mode.md
+docs/guide/03-understand.md
+docs/guide/06-verify-and-ship.md
+docs/guide/07-overnight.md
+docs/guide/08-principles.md
+docs/guide/README.md
+skills/architect/SKILL.md
+skills/architect/references/rationale-template.md
+skills/architect/references/runner-prompt.md
+skills/arena/SKILL.md
+skills/automate-me/SKILL.md
+skills/blast-radius/SKILL.md
+skills/figure-it-out/SKILL.md
+skills/how/SKILL.md
+skills/how/references/explainer-prompt.md
+skills/how/references/explorer-prompt.md
+skills/interrogate/SKILL.md
+skills/interrogate/references/code-quality-review.md
+skills/interrogate/references/lead-judgment.md
+skills/interrogate/references/rubric.md
+skills/no-comments/SKILL.md
+skills/poteto-mode/SKILL.md
+skills/poteto-mode/playbooks/authoring-a-skill.md
+skills/poteto-mode/playbooks/autonomous-run.md
+skills/poteto-mode/playbooks/autopilot-full.md
+skills/poteto-mode/playbooks/autopilot-stack.md
+skills/poteto-mode/playbooks/babysit.md
+skills/poteto-mode/playbooks/bug-fix.md
+skills/poteto-mode/playbooks/eval.md
+skills/poteto-mode/playbooks/feature.md
+skills/poteto-mode/playbooks/hillclimb.md
+skills/poteto-mode/playbooks/investigation.md
+skills/poteto-mode/playbooks/multi-phase-plan.md
+skills/poteto-mode/playbooks/opening-a-pr.md
+skills/poteto-mode/playbooks/orchestrate.md
+skills/poteto-mode/playbooks/pause-safely.md
+skills/poteto-mode/playbooks/perf-issue.md
+skills/poteto-mode/playbooks/prototype.md
+skills/poteto-mode/playbooks/refactoring.md
+skills/poteto-mode/playbooks/runtime-forensics.md
+skills/poteto-mode/playbooks/session-pickup.md
+skills/poteto-mode/playbooks/shipping.md
+skills/poteto-mode/playbooks/trace-forensics.md
+skills/poteto-mode/playbooks/visual-parity.md
+skills/poteto-mode/playbooks/worktree-cleanup.md
+skills/poteto-mode/references/bugbot-triage.md
+skills/principle-attack-the-premise/SKILL.md
+skills/principle-boundary-discipline/SKILL.md
+skills/principle-build-the-lever/SKILL.md
+skills/principle-encode-lessons-in-structure/SKILL.md
+skills/principle-exhaust-the-design-space/SKILL.md
+skills/principle-experience-first/SKILL.md
+skills/principle-fix-root-causes/SKILL.md
+skills/principle-foundational-thinking/SKILL.md
+skills/principle-guard-the-context-window/SKILL.md
+skills/principle-laziness-protocol/SKILL.md
+skills/principle-make-operations-idempotent/SKILL.md
+skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md
+skills/principle-minimize-reader-load/SKILL.md
+skills/principle-model-the-domain/SKILL.md
+skills/principle-never-block-on-the-human/SKILL.md
+skills/principle-outcome-oriented-execution/SKILL.md
+skills/principle-prove-it-works/SKILL.md
+skills/principle-redesign-from-first-principles/SKILL.md
+skills/principle-separate-before-serializing-shared-state/SKILL.md
+skills/principle-sequence-verifiable-units/SKILL.md
+skills/principle-subtract-before-you-add/SKILL.md
+skills/principle-test-behavior-not-implementation/SKILL.md
+skills/principle-type-system-discipline/SKILL.md
+skills/recall/SKILL.md
+skills/reflect/SKILL.md
+skills/reflect/references/divergent-reviewer.md
+skills/reflect/references/judgment-reviewer.md
+skills/reflect/references/synthesizer.md
+skills/reflect/references/tooling-reviewer.md
+skills/setup-pstack/references/spawn.md
+skills/show-me-your-work/SKILL.md
+skills/swarm/SKILL.md
+skills/tdd/SKILL.md
+skills/teach/SKILL.md
+skills/technical-writing/SKILL.md
+skills/typescript-best-practices/SKILL.md
+skills/typescript-best-practices/references/patterns.md
+skills/unslop/SKILL.md
+skills/why/SKILL.md
+skills/why/references/epistemics.md
+skills/why/references/investigator-prompt.md
+skills/why/references/source-playbook.md
+skills/why/references/sources/databricks.md
+skills/why/references/sources/datadog.md
+skills/why/references/sources/incident-postmortem.md
+skills/why/references/sources/linear.md
+skills/why/references/sources/notion.md
+skills/why/references/sources/sentry.md
+skills/why/references/sources/slack.md
+skills/why/references/synthesizer-prompt.md
+```
+
+Deleted:
+
+```text
+skills/how/references/critic-prompt.md
+skills/how/references/critique-rubric.md
+```
