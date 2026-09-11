@@ -14,6 +14,10 @@ export const OVERLAY_FILENAME = 'pstack-dsh.json'
 export const OAUTH_AUTH_FILENAME = '.dsh-oauth-auth.json'
 export const OAUTH_AUTH_LEGACY_FILENAME = '.pi-login-auth.json'
 
+/** Antigravity OAuth store from dsh-antigravity-oauth. */
+export const ANTIGRAVITY_AUTH_FILENAME = '.dsh-antigravity-oauth.json'
+export const ANTIGRAVITY_PROVIDER = 'agy-google-antigravity'
+
 /** Official DeepSeek adapter. `packages/llm/llm-deepseek/src/index.ts` `PROVIDER`, `DEFAULT_API_KEY_ENV`. */
 export const DEEPSEEK_API_KEY_ENV = 'DEEPSEEK_API_KEY'
 export const DEEPSEEK_PROVIDER = 'deepseek-official'

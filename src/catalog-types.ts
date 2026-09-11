@@ -40,11 +40,15 @@ export const OAUTH_ROUTE_BY_STORE_ID: Readonly<Record<string, string>> = {
   'github-copilot': 'pi-github-copilot',
   openrouter: 'pi-openrouter',
   'kimi-coding': 'pi-kimi-coding',
+  antigravity: 'agy-google-antigravity',
 }
 
 export function storeIdForRoute(route: string): string | undefined {
   // dsh-oauth-login publishes pi-<credential-store-id>. buildCatalog calls this
   // only for registered adapters and separately requires that exact login id.
+  // dsh-antigravity-oauth publishes agy-google-antigravity (or agy-*).
   // New login providers must not need a second registration in pstack.
-  return route.startsWith('pi-') && route.length > 3 ? route.slice(3) : undefined
+  if (route.startsWith('pi-') && route.length > 3) return route.slice(3)
+  if (route === 'agy-google-antigravity' || route.startsWith('agy-')) return 'antigravity'
+  return undefined
 }

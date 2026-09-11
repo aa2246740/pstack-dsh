@@ -35,7 +35,7 @@ const GROUPS: { id: 'groupPlaybooks' | 'groupSkills' | 'groupVerify' | 'groupPan
   { id: 'groupPlaybooks', roles: ['feature', 'refactoring', 'bug-fix', 'perf-issue', 'hillclimb', 'judgment-and-prose', 'hardest-tasks'] },
   { id: 'groupSkills', roles: ['how-explorer', 'how-explainer', 'why-investigators', 'why-synthesizer', 'reflect-tooling', 'reflect-judgment', 'swarm-workers'] },
   { id: 'groupVerify', roles: ['independent-verifier', 'poteto-agent', 'comment-sicko'] },
-  { id: 'groupPanels', roles: PANEL_ROLES },
+  { id: 'groupPanels', roles: PANEL_ROLES.filter(role => role !== 'how-critics') },
 ]
 
 const SETTINGS_CSS = `
@@ -269,6 +269,8 @@ export function PstackSettings({ t, subscribeCatalogChanges }: PstackSettingsPro
   const save = async (): Promise<void> => {
     if (currentOverlay === undefined) return
     setBusy(true)
+    setNotice(undefined)
+    setError(undefined)
     try {
       const result = await saveSettingsOverlay(currentOverlay)
       setSaved(result.overlay)
@@ -277,6 +279,7 @@ export function PstackSettings({ t, subscribeCatalogChanges }: PstackSettingsPro
       setError(undefined)
       setNotice(t('saved'))
     } catch (caught: unknown) {
+      setNotice(undefined)
       setError(caught instanceof Error ? caught.message : t('requestFailed'))
     } finally {
       setBusy(false)

@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { writeFileAtomic } from '@deepseek-ai/dsh-atomic-write'
 import { OVERLAY_FILENAME } from './ids.ts'
 import { resolveDshHome } from './home.ts'
 import { emptyOverlay, parseOverlay, type Overlay } from './overlay-model.ts'
@@ -33,8 +34,7 @@ export async function readOverlay(dshHome = resolveDshHome()): Promise<{ path: s
 
 export async function writeOverlay(overlay: Overlay, dshHome = resolveDshHome()): Promise<string> {
   const path = overlayPath(dshHome)
-  await mkdir(dirname(path), { recursive: true })
   const body = `${JSON.stringify(overlay, null, 2)}\n`
-  await writeFile(path, body, { encoding: 'utf8', mode: 0o600 })
+  await writeFileAtomic(path, body, { mode: 0o600, dirMode: 0o700 })
   return path
 }

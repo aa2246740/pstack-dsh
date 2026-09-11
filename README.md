@@ -8,9 +8,9 @@
 
 ## 来源 / Credits
 
-22 个玩法（playbooks）和 21 条原则（principles）是 [poteto](https://x.com/poteto) 写的，出自 [official pstack](https://github.com/cursor/plugins/tree/main/pstack)。本仓库是 DeepSeek Harness 移植（[aa2246740/pstack-dsh](https://github.com/aa2246740/pstack-dsh)）。调用层用 [HARNESS.md](./HARNESS.md) 里的 DSH 工具名。玩法和原则不是本仓库写的。
+23 个玩法（playbooks）和 23 条原则（principles）是 [poteto](https://x.com/poteto) 写的，出自 [official pstack](https://github.com/cursor/plugins/tree/main/pstack)。本仓库是 DeepSeek Harness 移植（[aa2246740/pstack-dsh](https://github.com/aa2246740/pstack-dsh)）。调用层用 [HARNESS.md](./HARNESS.md) 里的 DSH 工具名。玩法和原则不是本仓库写的。
 
-The 22 playbooks and 21 principles are [poteto](https://x.com/poteto)'s, from [official pstack](https://github.com/cursor/plugins/tree/main/pstack). This repository is the DeepSeek Harness port ([aa2246740/pstack-dsh](https://github.com/aa2246740/pstack-dsh)). Harness calls use DSH tools named in [HARNESS.md](./HARNESS.md). This port did not author those playbooks or principles.
+The 23 playbooks and 23 principles are [poteto](https://x.com/poteto)'s, from [official pstack](https://github.com/cursor/plugins/tree/main/pstack). This repository is the DeepSeek Harness port ([aa2246740/pstack-dsh](https://github.com/aa2246740/pstack-dsh)). Harness calls use DSH tools named in [HARNESS.md](./HARNESS.md). This port did not author those playbooks or principles.
 
 ## 安装 / Install
 
@@ -42,9 +42,9 @@ Two steps.
 1. Use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) for work that needs rigor. No setup required. Children inherit this conversation's route.
 2. To pin a logged-in route per role, open **Settings → pstack** (nav label **pstack 角色** / **pstack roles**). The page writes `$DSH_HOME/pstack-dsh.json`. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) is an optional pointer to that page.
 
-角色模型列表会随 DSH 的登录、退出登录和模型目录变更通知更新，也可点击「刷新模型列表」。刷新只更新候选项，不覆盖尚未保存的角色和 effort；当前选择若失去登录会标为「暂不可用」。新加入 dsh-oauth-login 的 `pi-*` 路由只要已登录且已注册，就会自动纳入，无需在 pstack 里再维护一份提供商名单。
+角色模型列表会随 DSH 的登录、退出登录和模型目录变更通知更新，也可点击「刷新模型列表」。刷新只更新候选项，不覆盖尚未保存的角色和 effort；当前选择若失去登录会标为「暂不可用」。新加入 dsh-oauth-login 的 `pi-*` 路由以及 dsh-antigravity-oauth 的 `agy-*` 路由只要已登录且已注册，就会自动纳入，无需在 pstack 里再维护一份提供商名单。
 
-Model choices follow DSH login/logout and catalog notifications. **Refresh models** also updates the choices without replacing unsaved role/effort edits. A selected route that becomes unavailable stays visibly marked. Newly registered, signed-in `pi-*` routes are discovered without a second provider allowlist.
+Model choices follow DSH login/logout and catalog notifications. **Refresh models** also updates the choices without replacing unsaved role/effort edits. A selected route that becomes unavailable stays visibly marked. Newly registered, signed-in `pi-*` and `agy-*` routes are discovered without a second provider allowlist.
 
 第一次用可以看 [pstack 指南](./docs/guide/README.md)。
 
@@ -53,6 +53,14 @@ New here? The [pstack guide](./docs/guide/README.md) walks through a first real 
 其余技能是按需的。`/poteto-mode` 会在步骤需要时自己去调。
 
 The other skills are situational. The mode skill uses them when a step needs them.
+
+## 上游 0.15 同步
+
+技能内容同步至 `cursor/plugins` 的 pstack 0.15.0，提交 `71ed0d1076fec562c1b74ee353121a8d00f75382`。保留 DSH 工具和角色路由。
+
+设置页的「Poteto 0.15 推荐」仅供参考，不会替换用户已保存的模型或 effort。`how-critics` 不再显示或启动代理，旧配置仍可读写并保留。不包含 Cursor 专用的 make-bot-ui。
+
+The Poteto 0.15 recommendations are display-only. Existing model and effort assignments remain unchanged. The retired `how-critics` setting stays readable for compatibility but is hidden and never starts an agent. Cursor-only make-bot-ui is not included.
 
 ## 默认模型与 effort / Defaults
 
@@ -72,13 +80,13 @@ Effort is only the ids that route actually accepts. If the route has none, omit 
 
 The editor is the official Settings `settings.section` (id `pstack`, order 16). It lists logged-in routes only. Effort options are that route's live `resolveModelInfo().reasoning.efforts`. An empty list means inherit the parent. Save writes the same overlay, not a second file.
 
-设置页只列出已经登录的 API key 路由，以及 dsh-oauth-login 仓库里已经签过名、并且 `pi-*` 适配器已注册的路由。空目录就是继承父对话。
+设置页只列出已经登录的 API key 路由，以及 dsh-oauth-login / dsh-antigravity-oauth 里已经签过名、并且适配器已注册的路由。空目录就是继承父对话。
 
 ## 推荐依赖 / Recommended peer
 
-订阅登录（ChatGPT / Claude / Grok / Copilot / OpenRouter / Kimi）要出现在 **设置 → pstack** 列表里，需要另装 [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login)。不是硬依赖。只用 API key 的用户可以不装。本插件不读写 `~/.pi`、`~/.codex`、`~/.claude`、grok CLI 登录文件。
+订阅与服务登录（ChatGPT / Claude / Grok / Copilot / OpenRouter / Kimi / Google Antigravity）要出现在 **设置 → pstack** 列表里，可按需安装 [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login) 或 dsh-antigravity-oauth。不是硬依赖。只用 API key 的用户可以不装。本插件不读写 `~/.pi`、`~/.codex`、`~/.claude`、grok CLI 登录文件。
 
-Subscription logins show up on **Settings → pstack** after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login). It is not required. API-key-only users work without it. This plugin does not read or write official CLI auth files.
+Subscription logins show up on **Settings → pstack** after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login) or dsh-antigravity-oauth. They are not required. API-key-only users work without them. This plugin does not read or write official CLI auth files.
 
 ```bash
 dsh plugin add github:aa2246740/dsh-oauth-login

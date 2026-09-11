@@ -91,7 +91,7 @@ describe('settings draft', () => {
     assert.equal(result.overlay.roles.feature?.routes[0]?.provider, 'deepseek-official')
   })
 
-  it('applies one logged-in route to every role including panels', () => {
+  it('applies one logged-in route to active roles including panels', () => {
     const drafts = applyRouteToAll(
       overlayToDraft(emptyOverlay()),
       { provider: 'deepseek-official', model: 'deepseek-chat', reasoningEffort: 'high' },
@@ -99,7 +99,8 @@ describe('settings draft', () => {
     )
     const overlay = draftToOverlay(drafts)
     assert.equal(overlay.roles.feature?.inherit, false)
-    assert.equal(overlay.roles['how-critics']?.routes.length, 1)
+    assert.equal(overlay.roles['arena-runners']?.routes.length, 1)
+    assert.deepEqual(overlay.roles['how-critics'], { inherit: true, routes: [] })
     assert.equal(overlay.roles.feature?.routes[0]?.reasoningEffort, 'high')
     const noEffort = applyRouteToAll(
       overlayToDraft(emptyOverlay()),
@@ -107,6 +108,49 @@ describe('settings draft', () => {
       live,
     )
     assert.equal(draftToOverlay(noEffort).roles.feature?.routes[0]?.reasoningEffort, undefined)
+  })
+
+  it('preserves saved user routes, efforts, and legacy critics through draft load/save', () => {
+    const overlay = parseOverlay(JSON.stringify({
+      version: 1,
+      roles: {
+        'bug-fix': {
+          inherit: false,
+          routes: [{ provider: 'deepseek-official', model: 'deepseek-chat', reasoningEffort: 'high' }],
+        },
+        'how-critics': {
+          inherit: false,
+          routes: [
+            { provider: 'retired-provider', model: 'retired-model', reasoningEffort: 'legacy-max' },
+            { provider: 'pi-anthropic', model: 'claude-sonnet-4-6', reasoningEffort: 'old-effort' },
+          ],
+        },
+      },
+    }))
+    const original = structuredClone(overlay)
+    const cleaned = dropUnselectableRoles(overlay, live)
+    assert.deepEqual(cleaned.droppedRoles, [])
+    assert.deepEqual(cleaned.overlay, original)
+    const drafts = overlayToDraft(cleaned.overlay)
+    assert.deepEqual(parseOverlay(JSON.stringify(draftToOverlay(drafts))), original)
+
+    const remapped = draftToOverlay(applyRouteToAll(
+      drafts,
+      { provider: 'pi-anthropic', model: 'claude-sonnet-4-6' },
+      live,
+    ))
+    assert.deepEqual(remapped.roles['bug-fix']?.routes, [
+      { provider: 'pi-anthropic', model: 'claude-sonnet-4-6' },
+    ])
+    assert.deepEqual(remapped.roles['how-critics'], original.roles['how-critics'])
+    for (const choice of ['auto', 'inherit-parent'] satisfies Array<'auto' | 'inherit-parent'>) {
+      const reset = draftToOverlay(applyInheritAll(overlayToDraft(remapped), choice))
+      assert.deepEqual(reset.roles['bug-fix'], { inherit: true, routes: [] })
+      assert.deepEqual(reset.roles['how-critics'], original.roles['how-critics'])
+      assert.deepEqual(parseOverlay(JSON.stringify(reset)).roles['how-critics'], original.roles['how-critics'])
+    }
+    assert.deepEqual(draftToOverlay(drafts), original)
+    assert.deepEqual(overlay, original)
   })
 
   it('reset-all restores inherit-parent', () => {

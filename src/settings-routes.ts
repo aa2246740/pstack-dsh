@@ -2,6 +2,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Context } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-client-connection'
 import type { CatalogHost } from './catalog.ts'
 import { SETTINGS_SAVE_PATH, SETTINGS_SNAPSHOT_PATH } from './ids.ts'
 import { json, readJson, trustedRequest } from './http-trust.ts'
@@ -16,20 +17,12 @@ async function handleSnapshot(host: CatalogHost, req: IncomingMessage, res: Serv
     json(res, 405, { error: 'method not allowed' })
     return
   }
-  if (!trustedRequest(req)) {
-    json(res, 403, { error: 'forbidden' })
-    return
-  }
   json(res, 200, await loadSettingsSnapshot(host))
 }
 
 async function handleSave(host: CatalogHost, req: IncomingMessage, res: ServerResponse): Promise<void> {
   if (req.method !== 'PUT' && req.method !== 'POST') {
     json(res, 405, { error: 'method not allowed' })
-    return
-  }
-  if (!trustedRequest(req)) {
-    json(res, 403, { error: 'forbidden' })
     return
   }
   try {
@@ -55,6 +48,15 @@ export function registerPstackSettingsRoutes(ctx: Context, host: CatalogHost): v
         kind: 'exact',
         path: SETTINGS_SNAPSHOT_PATH,
         handler: async (req, res) => {
+          const rejection = ctx.connection.requestRejection(req)
+          if (rejection !== undefined) {
+            json(res, rejection, { error: rejection === 401 ? 'unauthorized' : 'forbidden' })
+            return
+          }
+          if (!trustedRequest(req)) {
+            json(res, 403, { error: 'forbidden' })
+            return
+          }
           if (req.method === 'GET') {
             await handleSnapshot(host, req, res)
             return

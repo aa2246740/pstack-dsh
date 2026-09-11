@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, it } from 'node:test'
 import { loadSettingsSnapshot, saveSettingsOverlay } from '../src/settings-api.ts'
+import { draftToOverlay, overlayToDraft } from '../src/settings-draft.ts'
+import { parseOverlay } from '../src/overlay-model.ts'
 import { OAUTH_AUTH_FILENAME, OVERLAY_FILENAME } from '../src/ids.ts'
 import { listenForCatalogChanges, type CatalogEventContext } from '../src/client/api.ts'
 
@@ -65,6 +67,45 @@ describe('settings snapshot/save', () => {
     const snapshot = await loadSettingsSnapshot(host)
     assert.equal(snapshot.overlay.roles.feature?.routes[0]?.reasoningEffort, 'high')
     assert.equal(snapshot.missing, false)
+  })
+
+  it('keeps user effort and stale legacy critics on disk through Settings load and draft save', async () => {
+    const home = await mkdtemp(join(tmpdir(), 'pstack-dsh-settings-legacy-'))
+    const host = {
+      dshHome: home,
+      env: {},
+      llm: llmStub(),
+      credentials: {
+        async describe(ref: string) { return { configured: ref === 'DEEPSEEK_API_KEY' } },
+      },
+    }
+    const original = parseOverlay(JSON.stringify({
+      version: 1,
+      roles: {
+        'bug-fix': {
+          inherit: false,
+          routes: [{ provider: 'deepseek-official', model: 'deepseek-chat', reasoningEffort: 'high' }],
+        },
+        'how-critics': {
+          inherit: false,
+          routes: [
+            { provider: 'retired-provider', model: 'retired-model', reasoningEffort: 'legacy-max' },
+            { provider: 'deepseek-official', model: 'deepseek-chat', reasoningEffort: 'obsolete-effort' },
+          ],
+        },
+      },
+    }))
+    const path = join(home, OVERLAY_FILENAME)
+    const bytes = JSON.stringify(original)
+    await writeFile(path, bytes)
+    const loaded = await loadSettingsSnapshot(host)
+    assert.deepEqual(loaded.droppedRoles, [])
+    assert.deepEqual(loaded.overlay, original)
+    assert.equal(await readFile(path, 'utf8'), bytes)
+    const saved = await saveSettingsOverlay(host, draftToOverlay(overlayToDraft(loaded.overlay)))
+    assert.deepEqual(saved.overlay, original)
+    assert.deepEqual(parseOverlay(await readFile(path, 'utf8')), original)
+    assert.deepEqual((await loadSettingsSnapshot(host)).overlay, original)
   })
 
   it('rejects a vendor slug the live catalog does not list', async () => {

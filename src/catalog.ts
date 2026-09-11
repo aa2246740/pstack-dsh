@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
+  ANTIGRAVITY_AUTH_FILENAME,
+  ANTIGRAVITY_PROVIDER,
   DEEPSEEK_API_KEY_ENV,
   DEEPSEEK_PROVIDER,
   OAUTH_AUTH_FILENAME,
@@ -98,18 +100,46 @@ async function refConfigured(credentials: CredentialsLike | undefined, env: Node
 
 async function readOauthStoreIds(dshHome: string): Promise<{ present: boolean; ids: string[] }> {
   const candidates = [join(dshHome, OAUTH_AUTH_FILENAME), join(dshHome, OAUTH_AUTH_LEGACY_FILENAME)]
+  let present = false
+  const ids = new Set<string>()
   for (const filename of candidates) {
     try {
       const text = await readFile(filename, 'utf8')
       const parsed: unknown = JSON.parse(text)
       if (!isRecord(parsed) || !isRecord(parsed.credentials)) continue
-      return { present: true, ids: Object.keys(parsed.credentials) }
+      present = true
+      for (const key of Object.keys(parsed.credentials)) ids.add(key)
+      break
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
-      return { present: true, ids: [] }
+      present = true
+      break
     }
   }
-  return { present: false, ids: [] }
+
+  try {
+    const text = await readFile(join(dshHome, ANTIGRAVITY_AUTH_FILENAME), 'utf8')
+    const parsed: unknown = JSON.parse(text)
+    if (isRecord(parsed) && isRecord(parsed.credential)) {
+      present = true
+      const cred = parsed.credential
+      if (
+        cred.type === 'oauth'
+        && typeof cred.projectId === 'string'
+        && cred.projectId.trim().length > 0
+        && typeof cred.expires === 'number'
+        && cred.expires > 0
+      ) {
+        ids.add('antigravity')
+      }
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      present = true
+    }
+  }
+
+  return { present, ids: [...ids] }
 }
 
 function effortsOf(info: { reasoning?: { efforts: LiveEffort[]; defaultEffort?: string } }): {
@@ -139,7 +169,7 @@ export async function buildCatalog(host: CatalogHost, signal?: AbortSignal): Pro
   const llm = host.llm
   const providers = llm?.listProviders() ?? []
   const registered = new Set(providers.map(provider => provider.id))
-  const oauthPluginPresent = [...registered].some(id => id.startsWith('pi-'))
+  const oauthPluginPresent = [...registered].some(id => id.startsWith('pi-') || id === ANTIGRAVITY_PROVIDER || id.startsWith('agy-'))
   const recommendOauthLogin = oauth.ids.length === 0 && !oauthPluginPresent
 
   const refsByProvider = new Map<string, Set<string>>()
@@ -237,17 +267,22 @@ export async function buildCatalog(host: CatalogHost, signal?: AbortSignal): Pro
     const route = OAUTH_ROUTE_BY_STORE_ID[id]
     if (route === undefined) continue
     if (registered.has(route)) continue
+    const isAntigravity = id === 'antigravity' || route === ANTIGRAVITY_PROVIDER
     push({
       provider: route,
-      providerName: id,
+      providerName: isAntigravity ? 'Google Antigravity' : id,
       model: '*',
-      modelName: '(install dsh-oauth-login to load this route)',
+      modelName: isAntigravity
+        ? '(install dsh-antigravity-oauth to load this route)'
+        : '(install dsh-oauth-login to load this route)',
       selectable: false,
       source: 'oauth',
       oauthSignedIn: true,
       routeRegistered: false,
       efforts: [],
-      hint: 'Signed in at $DSH_HOME/.dsh-oauth-auth.json. Install https://github.com/aa2246740/dsh-oauth-login so the route is live.',
+      hint: isAntigravity
+        ? 'Signed in at $DSH_HOME/.dsh-antigravity-oauth.json. Install dsh-antigravity-oauth so the route is live.'
+        : 'Signed in at $DSH_HOME/.dsh-oauth-auth.json. Install https://github.com/aa2246740/dsh-oauth-login so the route is live.',
     })
   }
 
@@ -265,7 +300,7 @@ export async function buildCatalog(host: CatalogHost, signal?: AbortSignal): Pro
     ...selectableCount === 0
       ? {
         emptyReason: recommendOauthLogin
-          ? 'No logged-in API key and no dsh-oauth-login store. Children inherit this conversation. Add a key in DSH, or install/login https://github.com/aa2246740/dsh-oauth-login.'
+          ? 'No logged-in API key and no dsh-oauth-login or dsh-antigravity-oauth store. Children inherit this conversation. Add a key in DSH, or install/login https://github.com/aa2246740/dsh-oauth-login / dsh-antigravity-oauth.'
           : 'No selectable live route. Children inherit this conversation.',
       }
       : {},

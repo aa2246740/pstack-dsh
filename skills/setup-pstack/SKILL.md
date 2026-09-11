@@ -21,7 +21,7 @@ Do not write `~/.cursor/rules`. Do not write `~/.grok/roles`. Do not invent Curs
 
 ## What the page lists
 
-Only live logged-in routes. Same rules as [`references/catalog.md`](references/catalog.md): API keys already configured in this DSH, plus dsh-oauth-login store ids whose `pi-*` adapter is registered. Empty list means inherit. If `recommendOauthLogin` is true, mention installing https://github.com/aa2246740/dsh-oauth-login in one line. Do not block.
+Only live logged-in routes. Same rules as [`references/catalog.md`](references/catalog.md): API keys already configured in this DSH, plus OAuth store ids (dsh-oauth-login, dsh-antigravity-oauth) whose matching adapter is registered. Empty list means inherit. If `recommendOauthLogin` is true, mention installing https://github.com/aa2246740/dsh-oauth-login in one line. Do not block.
 
 ## If they are not on Web
 

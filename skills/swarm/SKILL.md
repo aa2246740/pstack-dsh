@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Swarm
 
-Fan out N parallel workers. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report. DSH children share the parent cwd; the parent creates worktrees when writers must not collide.
+Fan out N parallel workers. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report. DSH children share the parent cwd. The parent creates worktrees when writers must not collide.
 
 ## Start
 
@@ -23,11 +23,11 @@ Open a todolist with one entry per phase before launching anything.
 2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
 3. Set N from the user or derive it from the shape. N is total workers, not the cloud concurrency limit.
 4. Worker route is overlay `swarm-workers` when mapped, otherwise inherit this conversation. For a model race, each arm is a **selectable** catalog route (call `pstack_catalog`) or inherit. Do not invent slugs.
-5. Give each worker its own writable output when it writes. Use a worktree, branch, or `/tmp/swarm-<slug>/worker-<n>/`.
+5. Give each worker its own writable output when it writes.
 
 ## Phase B: Fan out
 
-Spawn all N workers in one message with `pstack_spawn`, `role: swarm-workers`, `run_in_background: true`. Do not send `model`, `role`, or `environment`. Overlay or inherit. Follow [`../setup-pstack/references/spawn.md`](../setup-pstack/references/spawn.md). When a worker needs a separate tree, this parent creates the worktree and puts the path in the brief.
+Spawn all N workers in one message with `pstack_spawn`, `role: swarm-workers`, `run_in_background: true`. Do not send `model`, `subagent_type`, or `environment`. Overlay or inherit. Follow [`../setup-pstack/references/spawn.md`](../setup-pstack/references/spawn.md). When a worker needs a separate tree, this parent creates the worktree and puts the path in the brief.
 
 Every brief stands alone. Include the goal, scope, exact slice or race arm, how to verify, and what to report. Reports use `PASS`, `ISSUES`, or `BLOCKED` with evidence.
 

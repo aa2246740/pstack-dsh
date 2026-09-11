@@ -75,6 +75,10 @@ export function dropUnselectableRoles(overlay: Overlay, live: readonly LiveRoute
   const selectable = new Set(live.filter(route => route.selectable).map(route => routeKey(route.provider, route.model)))
   for (const role of ALL_ROLES) {
     const assignment = overlay.roles[role] ?? { inherit: true, routes: [] }
+    if (role === 'how-critics') {
+      next.roles[role] = { inherit: assignment.inherit, routes: assignment.routes.map(route => ({ ...route })) }
+      continue
+    }
     if (assignment.inherit || assignment.routes.length === 0) {
       next.roles[role] = { inherit: true, routes: [] }
       continue
@@ -97,7 +101,7 @@ export function dropUnselectableRoles(overlay: Overlay, live: readonly LiveRoute
 }
 
 export function applyInheritAll(drafts: RoleDraft[], choice: InheritChoice = 'inherit-parent'): RoleDraft[] {
-  return drafts.map(draft => ({
+  return drafts.map(draft => draft.role === 'how-critics' ? draft : ({
     ...draft,
     inherit: true,
     inheritChoice: choice,
@@ -108,7 +112,7 @@ export function applyInheritAll(drafts: RoleDraft[], choice: InheritChoice = 'in
 export function applyRouteToAll(drafts: RoleDraft[], route: OverlayRoute, live: readonly LiveRoute[]): RoleDraft[] {
   const cleaned = stripIllegalEffort(route, live)
   if (liveFor(live, cleaned.provider, cleaned.model) === undefined) return drafts
-  return drafts.map(draft => ({
+  return drafts.map(draft => draft.role === 'how-critics' ? draft : ({
     ...draft,
     inherit: false,
     inheritChoice: 'inherit-parent',

@@ -109,6 +109,7 @@ export function validateOverlayAgainstCatalog(overlay: Overlay, routes: readonly
   const errors: string[] = []
   const live = new Map(routes.filter(route => route.selectable).map(route => [routeKey(route.provider, route.model), route]))
   for (const role of ALL_ROLES) {
+    if (role === 'how-critics') continue
     const assignment = overlay.roles[role] ?? { inherit: true, routes: [] }
     if (assignment.inherit) continue
     for (const [index, entry] of assignment.routes.entries()) {
