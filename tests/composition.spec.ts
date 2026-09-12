@@ -7,6 +7,34 @@ import { fileURLToPath } from 'node:url'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 describe('bundle composition', () => {
+  it('is installable with stock dsh plugin add from git', async () => {
+    const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
+      name: string
+      main: string
+      scripts: Record<string, string>
+      dsh: { bundle?: { patch?: string }; client: { platform: string; inject: string[] } }
+    }
+    assert.equal(pkg.name, 'pstack-dsh')
+    assert.equal(pkg.dsh.bundle?.patch, './cordis.patch.yml')
+    assert.equal(pkg.scripts.prepare, undefined)
+    assert.equal(pkg.main, 'lib/index.js')
+    const [host, client, readme, patch] = await Promise.all([
+      readFile(join(root, 'lib/index.js'), 'utf8'),
+      readFile(join(root, 'lib/client.js'), 'utf8'),
+      readFile(join(root, 'README.md'), 'utf8'),
+      readFile(join(root, 'cordis.patch.yml'), 'utf8'),
+    ])
+    assert.match(host, /function apply\(/)
+    assert.match(host, /export \{[^}]*\bapply\b/)
+    assert.match(client, /window\.__ModuleLoader__\.load/)
+    assert.match(patch, /id:\s*pstack-dsh/)
+    assert.match(patch, /name:\s*pstack-dsh/)
+    const lead = readme.split('```', 3)[1] ?? ''
+    assert.match(lead, /dsh plugin --profile web add github:aa2246740\/pstack-dsh/)
+    assert.match(readme, /\bpnpm\b/)
+    assert.doesNotMatch(readme.split('## 开发 / Develop')[0] ?? readme, /\bdshx\b|\bmy-plugins\b/)
+  })
+
   it('declares a web client half on settings.section, not a second config file', async () => {
     const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
       name: string
