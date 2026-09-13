@@ -1,5 +1,25 @@
 # official pstack 的 DeepSeek Harness 移植
 
+```sh
+dsh plugin --profile web add github:aa2246740/pstack-dsh
+```
+
+需要 **pnpm** 在 `PATH` 上。`dsh plugin` 会在 `$DSH_HOME/profiles/web` 里调用 pnpm。然后重启这个 Host，再刷新页面。Add 只写 profile，不会热加载正在跑的进程。
+
+Need **pnpm** on `PATH`. `dsh plugin` runs it in `$DSH_HOME/profiles/web`. Then restart that Host and reload the page. Add writes the profile; it does not hot-load a running process.
+
+`dsh` 不在 PATH 上时：
+
+If `dsh` is not on PATH:
+
+```sh
+npx @deepseek-ai/dsh plugin --profile web add github:aa2246740/pstack-dsh
+```
+
+仓库已提交构建好的 `lib/`，并声明了 `dsh.bundle.patch`，所以这次 `github:` 安装不跑 `prepare`，也不需要把包加进 profile 的 `allowBuilds`。
+
+This repo ships built `lib/` and declares `dsh.bundle.patch`, so the git add does not run a `prepare` script and does not need an `allowBuilds` entry.
+
 **English title.** pstack-dsh, a DeepSeek Harness port of official pstack.
 
 **中文.** 这是 official pstack 的 DeepSeek Harness 移植。玩法和原则来自 poteto 的 official pstack；只有调用层换成 DSH。
@@ -12,23 +32,28 @@
 
 The 23 playbooks and 23 principles are [poteto](https://x.com/poteto)'s, from [official pstack](https://github.com/cursor/plugins/tree/main/pstack). This repository is the DeepSeek Harness port ([aa2246740/pstack-dsh](https://github.com/aa2246740/pstack-dsh)). Harness calls use DSH tools named in [HARNESS.md](./HARNESS.md). This port did not author those playbooks or principles.
 
-## 安装 / Install
+## 本地目录 / Local checkout
 
-```bash
-dsh plugin add github:aa2246740/pstack-dsh
-```
-
-本地目录也可以：
+已经 clone 到本机时：
 
 A local checkout also works:
 
-```bash
-dsh plugin add ./pstack-dsh
+```sh
+git clone https://github.com/aa2246740/pstack-dsh.git
+dsh plugin --profile web add ./pstack-dsh
 ```
 
-工具对照见 [HARNESS.md](./HARNESS.md)。工作台是 [dshx](https://github.com/aa2246740/dsh-external-plugin-devkit)，用来 `check` / `verify-boot`。不要用它当 DSH 发行版。
+然后同样重启 Host，再刷新页面。
 
-Tool mapping is in [HARNESS.md](./HARNESS.md). [dshx](https://github.com/aa2246740/dsh-external-plugin-devkit) is the out-of-process workbench for `check` / `verify-boot`. It is not a DSH fork.
+Then restart that Host and reload the page.
+
+```sh
+dsh plugin --profile web remove pstack-dsh
+```
+
+DSH.app 的桌面 Plugin Manager 只接受 npm 包名，不接受 `github:`。桌面用户请用 `dsh web`（`--profile web`），或等 npm 发布。
+
+DSH.app's desktop Plugin Manager accepts npm package names only, not `github:`. Use `dsh web` (`--profile web`), or wait for an npm publish.
 
 ## 开始用 / Get started
 
@@ -88,8 +113,8 @@ The editor is the official Settings `settings.section` (id `pstack`, order 16). 
 
 Subscription logins show up on **Settings → pstack** after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login) or dsh-antigravity-oauth. They are not required. API-key-only users work without them. This plugin does not read or write official CLI auth files.
 
-```bash
-dsh plugin add github:aa2246740/dsh-oauth-login
+```sh
+dsh plugin --profile web add github:aa2246740/dsh-oauth-login
 ```
 
 ## 这不是 Cursor 插件 / Not the Cursor plugin
@@ -117,16 +142,14 @@ Slash entry: `/poteto-mode`, plus the bundled playbook and principle skills. [`/
 
 ## 开发 / Develop
 
-```bash
-npm install
-npm test
-npx dshx check pstack-dsh --harness /path/to/deepseek-harness
-npx dshx verify-boot pstack-dsh --port 43123
+```sh
+pnpm install
+pnpm test
 ```
 
-不要对用户正在用的 DSH Host 发 `--force`，也不要杀它。`verify-boot` 只允许隔离冷启动。对照 [TEST-PLAN.md](./TEST-PLAN.md)。
+不要对用户正在用的 DSH Host 发 `--force`，也不要杀它。对照 [TEST-PLAN.md](./TEST-PLAN.md)。
 
-Do not `--force` or kill a user's live DSH Host. `verify-boot` is isolated cold boot only. See [TEST-PLAN.md](./TEST-PLAN.md).
+Do not `--force` or kill a user's live DSH Host. See [TEST-PLAN.md](./TEST-PLAN.md).
 
 ## 许可 / License
 

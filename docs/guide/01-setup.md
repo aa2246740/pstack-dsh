@@ -4,13 +4,13 @@ In this page you install the plugin, pick which models pstack uses, and run your
 
 ## Install the plugin
 
-In DSH, run:
+Need **pnpm** on `PATH`. Then:
 
-```bash
-dsh plugin add github:aa2246740/pstack-dsh
+```sh
+dsh plugin --profile web add github:aa2246740/pstack-dsh
 ```
 
-Reload the DSH Web page after install so the client half can register.
+Restart that Host and reload the page. Add writes `$DSH_HOME/profiles/web`; it does not hot-load a running process.
 
 ## Pick your models
 

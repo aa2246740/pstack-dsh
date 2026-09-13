@@ -31,7 +31,6 @@
   },
   "scripts": {
     "build": "tsdown && node scripts/wrap-client.mjs",
-    "prepare": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.client.json --noEmit",
     "test": "node --experimental-strip-types --test tests/*.spec.ts",
     "check": "npm run typecheck && npm run test && npm run build"
