@@ -12,7 +12,7 @@ Workbench: [dshx](https://github.com/aa2246740/dsh-external-plugin-devkit) (`dsh
 
 **Yes. The discipline ports. Cursor and Grok runtimes do not.**
 
-Install this repo as a DSH plugin. Do not write `~/.cursor/rules`. Do not invent Cursor panel slugs. Do not send grok `task` fields. Out of the box, children inherit this conversation's route. Configure roles in **Settings → pstack**. `/setup-pstack` is an optional pointer.
+Install this repo as a DSH plugin on official DeepSeek Harness **0.1.5-rc.3** (`@deepseek-ai/dsh@0.1.5-rc.3`). `@deepseek-ai/dsh-*` peers are `^0.1.5-rc.3`. Do not write `~/.cursor/rules`. Do not invent Cursor panel slugs. Do not send grok `task` fields. Out of the box, children inherit this conversation's route. Configure roles in **Settings → pstack**. `/setup-pstack` is an optional pointer.
 
 Official model-facing `subagent` cannot take a pstack role or a per-call model. This plugin registers `pstack_spawn`, which calls `ctx.subagents.start` / `startContinuable` on the shipped `spawn` provider and applies overlay route plus effort on the `agent/request` waterfall.
 

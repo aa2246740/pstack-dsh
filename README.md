@@ -4,7 +4,11 @@
 dsh plugin --profile web add github:aa2246740/pstack-dsh
 ```
 
+面向官方 DeepSeek Harness **0.1.5-rc.3**（tag `dsh-v0.1.5-rc.3`，npm `@deepseek-ai/dsh@0.1.5-rc.3`）。Node `^22.19.0` 或 `>=24`。`@deepseek-ai/dsh-*` peer 是 `^0.1.5-rc.3`，这样 Host 上的 `0.1.5-rc.3` 能对上；`^0.1.2-rc.1` 对不上这个预发布版本。
+
 需要 **pnpm** 在 `PATH` 上。`dsh plugin` 会在 `$DSH_HOME/profiles/web` 里调用 pnpm。然后重启这个 Host，再刷新页面。Add 只写 profile，不会热加载正在跑的进程。
+
+Targets official DeepSeek Harness **0.1.5-rc.3** (tag `dsh-v0.1.5-rc.3`, npm `@deepseek-ai/dsh@0.1.5-rc.3`). Node `^22.19.0` or `>=24`. `@deepseek-ai/dsh-*` peers are `^0.1.5-rc.3`, so a Host on `0.1.5-rc.3` satisfies them. `^0.1.2-rc.1` does not satisfy that prerelease.
 
 Need **pnpm** on `PATH`. `dsh plugin` runs it in `$DSH_HOME/profiles/web`. Then restart that Host and reload the page. Add writes the profile; it does not hot-load a running process.
 
