@@ -29,10 +29,10 @@ describe('bundle composition', () => {
     assert.match(client, /window\.__ModuleLoader__\.load/)
     assert.match(patch, /id:\s*pstack-dsh/)
     assert.match(patch, /name:\s*pstack-dsh/)
-    const lead = readme.split('```', 3)[1] ?? ''
-    assert.match(lead, /dsh plugin --profile web add github:aa2246740\/pstack-dsh/)
-    assert.match(readme, /\bpnpm\b/)
-    assert.doesNotMatch(readme.split('## 开发 / Develop')[0] ?? readme, /\bdshx\b|\bmy-plugins\b/)
+    assert.match(readme, /设置 → 插件 → 添加插件/)
+    assert.match(readme, /github:aa2246740\/pstack-dsh#v0\.2\.1/)
+    assert.match(readme, /dsh plugin --profile web add github:aa2246740\/pstack-dsh#v0\.2\.1/)
+    assert.doesNotMatch(readme, /\bdshx\b|\bmy-plugins\b/i)
   })
 
   it('declares a web client half on settings.section, not a second config file', async () => {
