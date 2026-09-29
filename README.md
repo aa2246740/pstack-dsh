@@ -2,14 +2,14 @@
 
 ## 安装 / Install
 
-### DSH Studio 桌面 App（推荐） / Desktop app (recommended)
+### 官方 DeepSeek Harness 桌面 App（推荐） / Desktop app (recommended)
 
 打开 **设置 → 插件 → 添加插件**，在“包名或地址”中输入：
 
 Open **Settings → Plugins → Add plugin** and enter this in “Package name or address”:
 
 ```text
-github:aa2246740/pstack-dsh#v0.2.1
+github:aa2246740/pstack-dsh#v0.2.3
 ```
 
 桌面端插件管理器负责 Desktop profile 和内置包管理器。本发布已包含编译好的 `lib/`；普通使用不需要 clone 或本地构建。若应用提示刷新或重新打开，请按提示完成。
@@ -19,7 +19,7 @@ The desktop plugin manager owns the Desktop profile and bundled package manager.
 ### Web CLI
 
 ```sh
-dsh plugin --profile web add github:aa2246740/pstack-dsh#v0.2.1
+dsh plugin --profile web add github:aa2246740/pstack-dsh#v0.2.3
 ```
 
 这条官方 CLI 命令只写入 `web` profile，不能修改 Desktop App 的 profile。对于已运行的 Web Host，请重新打开该 Host 一次，再刷新网页。
@@ -124,7 +124,7 @@ The editor is the official Settings `settings.section` (id `pstack`, order 16). 
 Subscription logins show up on **Settings → pstack** after you install [dsh-oauth-login](https://github.com/aa2246740/dsh-oauth-login) or dsh-antigravity-oauth. They are not required. API-key-only users work without them. This plugin does not read or write official CLI auth files.
 
 ```sh
-dsh plugin --profile web add github:aa2246740/dsh-oauth-login#v0.2.6
+dsh plugin --profile web add github:aa2246740/dsh-oauth-login#v0.2.7
 ```
 
 ## 这不是 Cursor 插件 / Not the Cursor plugin
