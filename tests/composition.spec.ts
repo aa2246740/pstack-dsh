@@ -30,8 +30,8 @@ describe('bundle composition', () => {
     assert.match(patch, /id:\s*pstack-dsh/)
     assert.match(patch, /name:\s*pstack-dsh/)
     assert.match(readme, /设置 → 插件 → 添加插件/)
-    assert.match(readme, /github:aa2246740\/pstack-dsh#v0\.2\.1/)
-    assert.match(readme, /dsh plugin --profile web add github:aa2246740\/pstack-dsh#v0\.2\.1/)
+    assert.match(readme, /github:aa2246740\/pstack-dsh#v0\.2\.2/)
+    assert.match(readme, /dsh plugin --profile web add github:aa2246740\/pstack-dsh#v0\.2\.2/)
     assert.doesNotMatch(readme, /\bdshx\b|\bmy-plugins\b/i)
   })
 

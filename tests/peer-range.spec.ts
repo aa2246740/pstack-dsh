@@ -7,25 +7,29 @@ import semver from 'semver'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const HARNESS = '0.1.7-rc.2'
-const ALPHAS = ['0.1.7-alpha.1', '0.1.7-alpha.2']
+const ACCEPTED = ['0.2.0-rc.1', '0.2.0']
+const REJECTED = ['0.1.7-rc.2', '0.2.0-alpha.1']
 
-describe('DSH 0.1.7-rc.2 peers', () => {
-  it('accepts 0.1.7-rc.2 and rejects 0.1.7 alphas', async () => {
+describe('DSH 0.2.0-rc.1 peers', () => {
+  it('accepts 0.2.0-rc.1 and 0.2.0, and rejects 0.1.7-rc.2 and 0.2.0-alpha.1', async () => {
     const manifest = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8')) as {
       peerDependencies: Record<string, string>
       devDependencies: Record<string, string>
+      engines?: { node?: string }
     }
-    const peers = Object.entries(manifest.peerDependencies).filter(([name]) => name.startsWith('@deepseek-ai/dsh-'))
+    const peers = Object.entries(manifest.peerDependencies).filter(([name]) => name.startsWith('@deepseek-ai/dsh'))
     assert.ok(peers.length > 0)
     for (const [name, range] of peers) {
-      assert.equal(range, '>=0.1.7-rc.1 <0.1.8', name)
-      assert.equal(semver.satisfies(HARNESS, range), true, `${name} must accept ${HARNESS}`)
-      assert.equal(semver.satisfies(HARNESS, '^0.1.2-rc.1'), false)
-      for (const alpha of ALPHAS) {
-        assert.equal(semver.satisfies(alpha, range), false, `${name} must reject ${alpha}`)
+      assert.equal(range, '>=0.2.0-rc.1 <0.2.1', name)
+      for (const version of ACCEPTED) {
+        assert.equal(semver.satisfies(version, range), true, `${name} must accept ${version}`)
       }
-      assert.match(manifest.devDependencies[name], /^0\.1\.7-rc\.[12]$/, name)
+      for (const version of REJECTED) {
+        assert.equal(semver.satisfies(version, range), false, `${name} must reject ${version}`)
+      }
+      assert.equal(manifest.devDependencies[name], '0.2.0-rc.1', name)
     }
+    assert.equal(manifest.devDependencies['@deepseek-ai/cordis'], '4.0.4')
+    assert.equal(manifest.engines?.node, '^22.19.0 || >=24')
   })
 })

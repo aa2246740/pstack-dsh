@@ -9,7 +9,7 @@
 Open **Settings → Plugins → Add plugin** and enter this in “Package name or address”:
 
 ```text
-github:aa2246740/pstack-dsh#v0.2.1
+github:aa2246740/pstack-dsh#v0.2.2
 ```
 
 桌面端插件管理器负责 Desktop profile 和内置包管理器。本发布已包含编译好的 `lib/`；普通使用不需要 clone 或本地构建。若应用提示刷新或重新打开，请按提示完成。
@@ -19,16 +19,16 @@ The desktop plugin manager owns the Desktop profile and bundled package manager.
 ### Web CLI
 
 ```sh
-dsh plugin --profile web add github:aa2246740/pstack-dsh#v0.2.1
+dsh plugin --profile web add github:aa2246740/pstack-dsh#v0.2.2
 ```
 
 这条官方 CLI 命令只写入 `web` profile，不能修改 Desktop App 的 profile。对于已运行的 Web Host，请重新打开该 Host 一次，再刷新网页。
 
 This official CLI command writes only the `web` profile; it cannot modify the Desktop App profile. For an already-running Web Host, reopen that Host once and reload the page.
 
-面向官方 DeepSeek Harness **0.1.7-rc.2**（tag `dsh-v0.1.7-rc.2`，npm `@deepseek-ai/dsh@0.1.7-rc.2`）。Node `^22.19.0` 或 `>=24`。`@deepseek-ai/dsh-*` peer 范围是 `>=0.1.7-rc.1 <0.1.8`，接受 `0.1.7-rc.2`，拒绝 `0.1.7` alpha。
+面向官方 DeepSeek Harness **0.2.0-rc.1**（tag `dsh-v0.2.0-rc.1`，npm `@deepseek-ai/dsh@0.2.0-rc.1`）。Node `^22.19.0` 或 `>=24`。`@deepseek-ai/dsh-*` peer 范围是 `>=0.2.0-rc.1 <0.2.1`，接受 `0.2.0-rc.1` 和稳定版 `0.2.0`，拒绝 `0.2.0-alpha.*` 与 `0.1.7-rc.*`。
 
-Targets official DeepSeek Harness **0.1.7-rc.2** (tag `dsh-v0.1.7-rc.2`, npm `@deepseek-ai/dsh@0.1.7-rc.2`). Node `^22.19.0` or `>=24`. The `@deepseek-ai/dsh-*` peer range is `>=0.1.7-rc.1 <0.1.8`: it accepts `0.1.7-rc.2` and rejects `0.1.7` alphas.
+Targets official DeepSeek Harness **0.2.0-rc.1** (tag `dsh-v0.2.0-rc.1`, npm `@deepseek-ai/dsh@0.2.0-rc.1`). Node `^22.19.0` or `>=24`. The `@deepseek-ai/dsh-*` peer range is `>=0.2.0-rc.1 <0.2.1`: it accepts `0.2.0-rc.1` and stable `0.2.0`, and rejects `0.2.0-alpha.*` and `0.1.7-rc.*`.
 
 **English title.** pstack-dsh, a DeepSeek Harness port of official pstack.
 
