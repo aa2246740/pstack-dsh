@@ -26,9 +26,9 @@ dsh plugin --profile web add github:aa2246740/pstack-dsh#v0.2.1
 
 This official CLI command writes only the `web` profile; it cannot modify the Desktop App profile. For an already-running Web Host, reopen that Host once and reload the page.
 
-面向官方 DeepSeek Harness **0.1.7-rc.2**（tag `dsh-v0.1.7-rc.2`，npm `@deepseek-ai/dsh@0.1.7-rc.2`）。Node `^22.19.0` 或 `>=24`。`@deepseek-ai/dsh-*` peer 范围是 `>=0.1.7-rc.1 <0.1.8`，接受 `0.1.7-rc.2`，拒绝 `0.1.7` alpha。
+面向官方 DeepSeek Harness **0.2.0-rc.2**（tag `dsh-v0.2.0-rc.2`，npm `@deepseek-ai/dsh@0.2.0-rc.2`）。Node `^22.19.0` 或 `>=24`。`@deepseek-ai/dsh-*` peer 范围是 `>=0.2.0-rc.1 <0.2.1`，接受 `0.2.0-rc.2`，拒绝 `0.1.7` alpha。
 
-Targets official DeepSeek Harness **0.1.7-rc.2** (tag `dsh-v0.1.7-rc.2`, npm `@deepseek-ai/dsh@0.1.7-rc.2`). Node `^22.19.0` or `>=24`. The `@deepseek-ai/dsh-*` peer range is `>=0.1.7-rc.1 <0.1.8`: it accepts `0.1.7-rc.2` and rejects `0.1.7` alphas.
+Targets official DeepSeek Harness **0.2.0-rc.2** (tag `dsh-v0.2.0-rc.2`, npm `@deepseek-ai/dsh@0.2.0-rc.2`). Node `^22.19.0` or `>=24`. The `@deepseek-ai/dsh-*` peer range is `>=0.2.0-rc.1 <0.2.1`: it accepts `0.2.0-rc.2` and rejects `0.1.7` alphas.
 
 **English title.** pstack-dsh, a DeepSeek Harness port of official pstack.
 

@@ -1,5 +1,4 @@
 import { Context } from "@deepseek-ai/cordis";
-
 //#region src/plugin-config.d.ts
 /**
  * Standard Schema v1 Config. Loader validates before apply.
