@@ -10,6 +10,7 @@ describe('bundle composition', () => {
   it('is installable with stock dsh plugin add from git', async () => {
     const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
       name: string
+      version: string
       main: string
       scripts: Record<string, string>
       dsh: { bundle?: { patch?: string }; client: { platform: string; inject: string[] } }
@@ -30,8 +31,9 @@ describe('bundle composition', () => {
     assert.match(patch, /id:\s*pstack-dsh/)
     assert.match(patch, /name:\s*pstack-dsh/)
     assert.match(readme, /设置 → 插件 → 添加插件/)
-    assert.match(readme, /github:aa2246740\/pstack-dsh#v0\.2\.3/)
-    assert.match(readme, /dsh plugin --profile web add github:aa2246740\/pstack-dsh#v0\.2\.3/)
+    const tag = `v${pkg.version}`.replace(/\./g, '\\.')
+    assert.match(readme, new RegExp(`github:aa2246740/pstack-dsh#${tag}`))
+    assert.match(readme, new RegExp(`dsh plugin --profile web add github:aa2246740/pstack-dsh#${tag}`))
     assert.doesNotMatch(readme, /\bdshx\b|\bmy-plugins\b/i)
   })
 
