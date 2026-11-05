@@ -14,10 +14,7 @@ function stripFrontmatter(text: string): string {
   return text.slice(end + 4).replace(/^\s*\n/, '')
 }
 
-/**
- * Persona for a pstack role. Official spawn persona shadows deployment persona
- * (`SubagentStartRequest.persona`, `packages/subagent/subagent/src/types.ts`).
- */
+/** Load role instructions to prepend to the child's task, not its deployment persona. */
 export async function loadPersona(role: string, agentsRoot = defaultAgentsRoot()): Promise<string | undefined> {
   const key = normalizeRole(role)
   const files = key === 'comment-sicko'
