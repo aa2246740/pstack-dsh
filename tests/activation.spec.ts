@@ -21,7 +21,7 @@ async function fixture(t: TestContext, mapped = false) {
   const result = Promise.withResolvers<SubagentResult>()
   let disposals = 0
   const run: SubagentActivation & { messageId: MessageId } = {
-    childId: SessionId('child'), messageId: MessageId('accepted'), result: result.promise,
+    childId: SessionId('child'), name: 'child', messageId: MessageId('accepted'), result: result.promise,
     async dispose() { disposals++ },
   }
   const subagents: SubagentHandle = {
@@ -58,12 +58,11 @@ for (const background of [true, false]) {
     assert.equal(spec.provider, 'spawn')
     assert.equal(spec.label, 'Verify activation contract')
     assert.equal(spec.delivery, background ? 'parent' : 'caller')
-    assert.equal(spec.request.parent, parent)
-    assert.equal(spec.request.maxDepth, 3)
-    assert.deepEqual(spec.request.agentOptions, { provider: 'test', model: 'test-model', reasoningEffort: 'high' })
-    assert.equal('persona' in spec.request, false)
-    assert.equal('signal' in spec.request, false)
-    const text = JSON.stringify(spec.request.prompt)
+    assert.equal(spec.parent, parent)
+    assert.equal(spec.maxDepth, 3)
+    assert.deepEqual(spec.agentOptions, { provider: 'test', model: 'test-model', reasoningEffort: 'high' })
+    assert.equal('persona' in spec, false)
+    const text = JSON.stringify(spec.prompt)
     assert.match(text, /Poteto subagent/)
     assert.match(text, /Return OK/)
     assert.deepEqual(result, background
@@ -77,7 +76,7 @@ test('background inheritance omits child overrides and outlives tool cancellatio
   const f = await fixture(t)
   const result = await f.tool.execute(f.args, f.exec)
   assert.deepEqual(result, { kind: 'continuable', subagentId: 'child', role: 'feature', inherit: true })
-  assert.equal('agentOptions' in f.call().request, false)
+  assert.equal('agentOptions' in f.call(), false)
   f.controller.abort()
   assert.equal(f.disposals(), 0)
 })
@@ -91,7 +90,7 @@ test('one-shot provider uses managed parent delivery', async t => {
   const result = await f.tool.execute(f.args, f.exec)
   assert.deepEqual(result, { kind: 'activation', subagentId: 'child', role: 'feature', inherit: true })
   assert.equal(f.calls[0]?.delivery, 'parent')
-  assert.equal(f.call().request.maxDepth, 3)
+  assert.equal(f.call().maxDepth, 3)
   assert.equal(f.disposals(), 0)
 })
 

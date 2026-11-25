@@ -187,15 +187,13 @@ export function spawnTool(host: ToolHost): ToolDefinition {
       const run = await subagents.startActivation({
         provider: providerName, label: resolved.description, signal,
         delivery: resolved.runInBackground ? 'parent' : 'caller',
-        request: {
-          parent,
-          prompt: [{ type: 'text', text: persona ? `${persona}\n\nTask:\n${resolved.prompt}` : resolved.prompt }],
-          ...maxDepth === undefined ? {} : { maxDepth },
-          ...resolved.agentOptions ? { agentOptions: {
-            ...resolved.agentOptions,
-            ...resolved.reasoningEffort ? { reasoningEffort: ReasoningEffortId(resolved.reasoningEffort) } : {},
-          } } : {},
-        },
+        parent,
+        prompt: [{ type: 'text', text: persona ? `${persona}\n\nTask:\n${resolved.prompt}` : resolved.prompt }],
+        ...maxDepth === undefined ? {} : { maxDepth },
+        ...resolved.agentOptions ? { agentOptions: {
+          ...resolved.agentOptions,
+          ...resolved.reasoningEffort ? { reasoningEffort: ReasoningEffortId(resolved.reasoningEffort) } : {},
+        } } : {},
       })
       if (resolved.runInBackground) return {
         kind: provider.prepareContinuable === undefined ? 'activation' : 'continuable',

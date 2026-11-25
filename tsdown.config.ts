@@ -4,8 +4,8 @@ import { pathToFileURL } from 'node:url'
 import { defineConfig } from 'tsdown'
 
 const root = process.env.DSHX_HARNESS?.trim()
-if (!root) throw new Error('Set DSHX_HARNESS to the checkout used for this build.')
-const adapter = resolve(root, 'tools/dshx/src/client-build.js')
+const harnessAdapter = root ? resolve(root, 'tools/dshx/src/client-build.js') : undefined
+const adapter = harnessAdapter && existsSync(harnessAdapter) ? harnessAdapter : resolve('tools/client-build.js')
 if (!existsSync(adapter)) throw new Error(`dshx client build adapter not found: ${adapter}`)
 const { externalClientBundle } = await import(pathToFileURL(adapter).href)
 const [, client] = externalClientBundle('pstack-dsh', ['src/index.ts'], { clientEntry: 'src/client/index.tsx' })

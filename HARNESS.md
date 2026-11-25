@@ -14,7 +14,7 @@ Workbench: [dshx](https://github.com/aa2246740/dsh-external-plugin-devkit) (`dsh
 
 Install this repo as a DSH plugin on official DeepSeek Harness **0.1.5-rc.3** (`@deepseek-ai/dsh@0.1.5-rc.3`). `@deepseek-ai/dsh-*` peers are `^0.1.5-rc.3`. Do not write `~/.cursor/rules`. Do not invent Cursor panel slugs. Do not send grok `task` fields. Out of the box, children inherit this conversation's route. Configure roles in **Settings → pstack**. `/setup-pstack` is an optional pointer.
 
-This plugin registers `pstack_spawn` for pstack roles. It calls `ctx.subagents.startActivation` on the shipped `spawn` provider and supplies the overlay route and effort in `request.agentOptions` before creating the child. The locked DSH 0.2.1-rc.5 package already exposes this API; `start` and `startContinuable` are not public methods there.
+This plugin registers `pstack_spawn` for pstack roles. It calls `ctx.subagents.startActivation` on the shipped `spawn` provider and supplies the overlay route and effort in top-level `agentOptions` on the flattened `SubagentActivationSpec` before creating the child. DSH 0.2.2-rc.5 exposes this API; `start` and `startContinuable` are not public methods there.
 
 ## Mapping: pstack need → DSH API
 

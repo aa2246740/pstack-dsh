@@ -6,6 +6,7 @@ const unused = (): never => { throw new Error('unexpected Agent fixture access')
 export const parent: Agent = {
   id: SessionId('parent'),
   get options() { return unused() },
+  get model() { return unused() },
   get session() { return unused() },
   get inbox() { return unused() },
   get ctx() { return unused() },
