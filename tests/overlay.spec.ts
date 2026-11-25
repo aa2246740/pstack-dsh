@@ -175,7 +175,9 @@ describe('overlay', () => {
     assert.equal(current.overlay.roles.feature?.routes[0]?.reasoningEffort, 'high')
   })
 
-  it('keeps the previous overlay intact when the atomic replacement cannot start', async () => {
+  it('keeps the previous overlay intact when the atomic replacement cannot start', {
+    skip: process.platform === 'win32' ? 'POSIX chmod modes do not enforce Windows ACLs' : false,
+  }, async () => {
     const home = await mkdtemp(join(tmpdir(), 'pstack-dsh-overlay-failure-'))
     const path = join(home, 'pstack-dsh.json')
     const original = '{"version":1,"roles":{}}\n'
